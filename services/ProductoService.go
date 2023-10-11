@@ -1,9 +1,16 @@
 package services
 
-import "github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/repositories"
+import (
+	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/dto"
+	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/repositories"
+)
 
 type ProductoInterface interface {
 	//metodos
+	CreateProducto(producto *dto.Producto) bool
+	GetProductos() []*dto.Producto
+	UpdateProducto(id string, producto *dto.Producto) bool
+	DeleteProducto(id string) bool
 }
 
 type ProductoService struct {
@@ -15,3 +22,31 @@ func NewProductoService(productoRepository repositories.ProductoRepositoryInterf
 }
 
 //CRUD de producto
+
+func (ps *ProductoService) CreateProducto(producto *dto.Producto) bool {
+	ps.productoRepository.CreateProducto(producto.GetModel())
+
+	return true
+}
+
+func (ps *ProductoService) GetProductos() []*dto.Producto {
+	productosDB, _ := ps.productoRepository.GetProductos()
+
+	var productos []*dto.Producto
+	for _, productoDB := range productosDB {
+		producto := dto.NewProducto(*productoDB)
+		productos = append(productos, producto)
+	}
+
+	return productos
+}
+
+func (ps *ProductoService) UpdateProducto(id string, producto *dto.Producto) bool {
+	ps.productoRepository.UpdateProducto(id, producto.GetModel())
+	return true
+}
+
+func (ps *ProductoService) DeleteProducto(id string) bool {
+	ps.productoRepository.DeleteProducto(id)
+	return true
+}

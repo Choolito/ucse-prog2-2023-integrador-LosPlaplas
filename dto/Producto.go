@@ -10,7 +10,7 @@ import (
 type Producto struct {
 	ID                 string
 	CodigoProducto     string
-	TipoProducto       string
+	TipoProducto       string //tipos de productos son: golosinas, bebidas, cigarrillos, comestibles, higiene y salud.
 	Nombre             string
 	PrecioUnitario     int
 	PesoUnitario       int

@@ -5,16 +5,12 @@ import (
 )
 
 type EnviosHandler struct {
-	enviosService  services.EnviosInterface
-	pedidosService services.PedidosInterface
-	camionService  services.CamionInterface
+	enviosService services.EnviosInterface
 }
 
 func NewEnviosHandler(enviosService services.EnviosInterface, pedidosService services.PedidosInterface, camionService services.CamionInterface) *EnviosHandler {
 	return &EnviosHandler{
-		enviosService:  enviosService,
-		pedidosService: pedidosService,
-		camionService:  camionService,
+		enviosService: enviosService,
 	}
 }
 

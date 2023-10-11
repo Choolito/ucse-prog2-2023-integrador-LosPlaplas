@@ -29,7 +29,25 @@ func main() {
 }
 
 func mappingRoutes() {
+	//Productos CRUD
+	router.POST("/productos", productoHandler.CreateProducto)
+	router.GET("/productos", productoHandler.GetProductos)
+	//Lista de productos con stock menor al mínimo. Se puede filtrar por tipo de producto.
+	router.PUT("/productos/:id", productoHandler.UpdateProducto)
+	router.DELETE("/productos/:id", productoHandler.DeleteProducto)
 
+	//Camiones CRUD
+	router.POST("/camiones", camionHandler.CreateCamion)
+	router.GET("/camiones", camionHandler.GetCamiones)
+	router.PUT("/camiones/:id", camionHandler.UpdateCamion)
+	router.DELETE("/camiones/:id", camionHandler.DeleteCamion)
+
+	//Pedidos CRUD
+	router.POST("/pedidos", pedidosHandler.CreatePedido)
+	router.GET("/pedidos", pedidosHandler.GetPedidos)
+	//Se puede filtrar por código de envío, estado, rango de fecha de creación.
+	router.PUT("/pedidos/:id", pedidosHandler.UpdatePedido)
+	router.PUT("/pedidos/cancelar/:id", pedidosHandler.DeletePedido)
 }
 
 func dependencies() {
