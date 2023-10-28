@@ -11,6 +11,8 @@ type PedidosInterface interface {
 	GetPedidos() []*dto.Pedidos
 	UpdatePedido(id string, pedido *dto.Pedidos) bool
 	DeletePedido(id string) bool
+	GetPedidosPendientes() []*dto.Pedidos
+	UpdatePedidoAceptado(id string) bool
 }
 
 type PedidosService struct {
@@ -52,6 +54,24 @@ func (ps *PedidosService) UpdatePedido(id string, pedido *dto.Pedidos) bool {
 
 func (ps *PedidosService) DeletePedido(id string) bool {
 	ps.pedidosRepository.DeletePedido(id)
+
+	return true
+}
+
+func (ps *PedidosService) GetPedidosPendientes() []*dto.Pedidos {
+	pedidosDB, _ := ps.pedidosRepository.GetPedidosPendientes()
+
+	var pedidos []*dto.Pedidos
+	for _, pedidoDB := range pedidosDB {
+		pedido := dto.NewPedidos(*pedidoDB)
+		pedidos = append(pedidos, pedido)
+	}
+
+	return pedidos
+}
+
+func (ps *PedidosService) UpdatePedidoAceptado(id string) bool {
+	ps.pedidosRepository.UpdatePedidoAceptado(id)
 
 	return true
 }

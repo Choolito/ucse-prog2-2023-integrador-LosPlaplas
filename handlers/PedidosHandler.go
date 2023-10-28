@@ -63,3 +63,15 @@ func (ph *PedidosHandler) DeletePedido(c *gin.Context) {
 
 	c.JSON(http.StatusOK, resultado)
 }
+
+func (ph *PedidosHandler) GetPedidosPendientes(c *gin.Context) {
+	pedidos := ph.pedidosService.GetPedidosPendientes()
+	c.JSON(http.StatusOK, pedidos)
+}
+func (ph *PedidosHandler) UpdatePedidoAceptado(c *gin.Context) {
+	id := c.Param("id")
+
+	resultado := ph.pedidosService.UpdatePedidoAceptado(id)
+
+	c.JSON(http.StatusOK, resultado)
+}

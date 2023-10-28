@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/handlers"
+	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/middlewares"
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/repositories"
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/services"
 	"github.com/gin-gonic/gin"
@@ -29,25 +30,45 @@ func main() {
 }
 
 func mappingRoutes() {
+
 	//Productos CRUD
-	router.POST("/productos", productoHandler.CreateProducto)
-	router.GET("/productos", productoHandler.GetProductos)
+	groupProductos := router.Group("/productos")
+	groupProductos.Use(middlewares.CORSMiddleware())
+
+	groupProductos.POST("/", productoHandler.CreateProducto)
+	groupProductos.GET("/", productoHandler.GetProductos)
 	//Lista de productos con stock menor al mínimo. Se puede filtrar por tipo de producto.
-	router.PUT("/productos/:id", productoHandler.UpdateProducto)
-	router.DELETE("/productos/:id", productoHandler.DeleteProducto)
+	groupProductos.PUT("/:id", productoHandler.UpdateProducto)
+	groupProductos.DELETE("/:id", productoHandler.DeleteProducto)
 
 	//Camiones CRUD
-	router.POST("/camiones", camionHandler.CreateCamion)
-	router.GET("/camiones", camionHandler.GetCamiones)
-	router.PUT("/camiones/:id", camionHandler.UpdateCamion)
-	router.DELETE("/camiones/:id", camionHandler.DeleteCamion)
+	groupCamiones := router.Group("/camiones")
+	groupCamiones.Use(middlewares.CORSMiddleware())
+
+	groupCamiones.POST("/", camionHandler.CreateCamion)
+	groupCamiones.GET("/", camionHandler.GetCamiones)
+	groupCamiones.PUT("/:id", camionHandler.UpdateCamion)
+	groupCamiones.DELETE("/:id", camionHandler.DeleteCamion)
 
 	//Pedidos CRUD
-	router.POST("/pedidos", pedidosHandler.CreatePedido)
-	router.GET("/pedidos", pedidosHandler.GetPedidos)
+	groupPedidos := router.Group("/pedidos")
+	groupPedidos.Use(middlewares.CORSMiddleware())
+
+	groupPedidos.POST("/", pedidosHandler.CreatePedido)
+	groupPedidos.GET("/", pedidosHandler.GetPedidos)
 	//Se puede filtrar por código de envío, estado, rango de fecha de creación.
-	router.PUT("/pedidos/:id", pedidosHandler.UpdatePedido)
-	router.PUT("/pedidos/cancelar/:id", pedidosHandler.DeletePedido)
+	groupPedidos.PUT("/:id", pedidosHandler.UpdatePedido)
+	groupPedidos.PUT("/cancelar/:id", pedidosHandler.DeletePedido)
+	//Lista pedidos pendientes
+	groupPedidos.GET("/pendientes", pedidosHandler.GetPedidosPendientes)
+	groupPedidos.PUT("/aceptar/:id", pedidosHandler.UpdatePedidoAceptado)
+
+	//Envios
+	groupEnvios := router.Group("/envios")
+	groupEnvios.Use(middlewares.CORSMiddleware())
+
+	groupEnvios.POST("/", enviosHandler.CreateEnvio)
+	groupEnvios.PUT("/iniciar/:id", enviosHandler.StartTrip)
 }
 
 func dependencies() {
@@ -80,6 +101,6 @@ func dependencies() {
 	var enviosRepository repositories.EnviosRepositoryInterface
 	var enviosService services.EnviosInterface
 	enviosRepository = repositories.NewEnviosRepository(database)
-	enviosService = services.NewEnviosService(enviosRepository)
-	enviosHandler = handlers.NewEnviosHandler(enviosService, pedidosService, camionService)
+	enviosService = services.NewEnviosService(enviosRepository, pedidosRepository, camionRepository)
+	enviosHandler = handlers.NewEnviosHandler(enviosService)
 }

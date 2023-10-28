@@ -16,6 +16,8 @@ type CamionRepositoryInterface interface {
 	GetCamiones() ([]*model.Camion, error)
 	UpdateCamion(id string, camion model.Camion) (*mongo.UpdateResult, error)
 	DeleteCamion(id string) (*mongo.DeleteResult, error)
+	//envios
+	GetCamionForID(id string) (*model.Camion, error)
 }
 
 type CamionRepository struct {
@@ -56,6 +58,19 @@ func (cr *CamionRepository) GetCamiones() ([]*model.Camion, error) {
 		camiones = append(camiones, &camion)
 	}
 	return camiones, err
+}
+
+func (cr *CamionRepository) GetCamionForID(id string) (*model.Camion, error) {
+	collection := cr.db.GetClient().Database("LosPlaplas").Collection("camiones")
+
+	objectID := utils.GetObjectIDFromStringID(id)
+
+	filtro := bson.M{"_id": objectID}
+
+	var camion model.Camion
+	err := collection.FindOne(context.Background(), filtro).Decode(&camion)
+
+	return &camion, err
 }
 
 func (cr *CamionRepository) UpdateCamion(id string, camion model.Camion) (*mongo.UpdateResult, error) {
