@@ -23,7 +23,7 @@ func NewEnviosHandler(enviosService services.EnviosInterface) *EnviosHandler {
 //Las paradas las puede ir haciendo y se guarda ciudad y km recorridos desde ultima parada/inicio.
 //Metodo generarParadas
 
-func (enviosHandler *EnviosHandler) CreateEnvio(c *gin.Context) {
+func (enviosHandler *EnviosHandler) CreateShipping(c *gin.Context) {
 	var envio dto.Envio
 
 	if err := c.ShouldBindJSON(&envio); err != nil {
@@ -31,7 +31,7 @@ func (enviosHandler *EnviosHandler) CreateEnvio(c *gin.Context) {
 		return
 	}
 
-	resultado := enviosHandler.enviosService.CreateEnvio(&envio)
+	resultado := enviosHandler.enviosService.CreateShipping(&envio)
 
 	c.JSON(http.StatusOK, resultado)
 }
@@ -54,6 +54,17 @@ func (enviosHandler *EnviosHandler) GenerateStop(c *gin.Context) {
 	//verificar que no sea nulo
 
 	resultado := enviosHandler.enviosService.GenerateStop(id, parada)
+
+	c.JSON(http.StatusOK, resultado)
+}
+
+func (EnviosHandler *EnviosHandler) FinishTrip(c *gin.Context) {
+	id := c.Param("id")
+
+	var paradaDestino dto.Parada
+	//verificar que no sea nulo
+
+	resultado := EnviosHandler.enviosService.FinishTrip(id, paradaDestino)
 
 	c.JSON(http.StatusOK, resultado)
 }

@@ -8,15 +8,17 @@ import (
 
 type EnviosInterface interface {
 	//metodos
-	CreateEnvio(envio *dto.Envio) bool
+	CreateShipping(envio *dto.Envio) bool
 	StartTrip(id string) bool
 	GenerateStop(id string, parada dto.Parada) bool
+	FinishTrip(id string, paradaDestino dto.Parada) bool
 }
 
 type EnviosService struct {
-	enviosRepository  repositories.EnviosRepositoryInterface
-	pedidosRepository repositories.PedidosRepositoryInterface
-	camionRepository  repositories.CamionRepositoryInterface
+	enviosRepository   repositories.EnviosRepositoryInterface
+	pedidosRepository  repositories.PedidosRepositoryInterface
+	camionRepository   repositories.CamionRepositoryInterface
+	productoRepository repositories.ProductoRepositoryInterface
 }
 
 func NewEnviosService(enviosRepository repositories.EnviosRepositoryInterface, pedidosRepository repositories.PedidosRepositoryInterface,
@@ -34,7 +36,7 @@ func NewEnviosService(enviosRepository repositories.EnviosRepositoryInterface, p
 //Se genere un envio
 //Envio pasa a estado "A despachar".
 
-func (enviosService *EnviosService) CreateEnvio(envio *dto.Envio) bool {
+func (enviosService *EnviosService) CreateShipping(envio *dto.Envio) bool {
 	camion, _ := enviosService.camionRepository.GetCamionForID(envio.IDCamion)
 	pesoMaximo := camion.PesoMaximo
 
@@ -62,7 +64,7 @@ func (enviosService *EnviosService) CreateEnvio(envio *dto.Envio) bool {
 		enviosService.pedidosRepository.UpdatePedidoParaEnviar(pedido.ID.Hex())
 	}
 
-	enviosService.enviosRepository.CreateEnvio(envio.GetModel())
+	enviosService.enviosRepository.CreateShipping(envio.GetModel())
 
 	return true
 }
@@ -73,7 +75,30 @@ func (enviosService *EnviosService) StartTrip(id string) bool {
 }
 
 func (enviosService *EnviosService) GenerateStop(id string, parada dto.Parada) bool {
-	enviosService.enviosRepository.GenerateStop(id, parada.GetModel())
-	//Falta corroborar que haya llegado a destino
-	return true
+	envio, _ := enviosService.enviosRepository.GetShippingForID(id)
+	if envio.Estado == "En ruta" {
+		enviosService.enviosRepository.GenerateStop(id, parada.GetModel())
+		return true
+	}
+
+	return false
+}
+
+func (enviosService *EnviosService) FinishTrip(id string, paradaDestino dto.Parada) bool {
+	envio, _ := enviosService.enviosRepository.GetShippingForID(id)
+	if envio.Estado == "En ruta" {
+		enviosService.enviosRepository.GenerateStop(id, paradaDestino.GetModel())
+		enviosService.enviosRepository.FinishTrip(id)
+		for _, pedido := range envio.Pedidos {
+			enviosService.pedidosRepository.UpdatePedidoEnviado(pedido)
+			pedido, _ := enviosService.pedidosRepository.GetPedidoForID(pedido)
+			for _, producto := range pedido.ListaProductos {
+				enviosService.productoRepository.DiscountStock(producto.CodigoProducto, producto.Cantidad)
+			}
+
+		}
+		return true
+	}
+
+	return false
 }

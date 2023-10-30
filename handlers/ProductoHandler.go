@@ -65,3 +65,9 @@ func (handler *ProductoHandler) DeleteProducto(c *gin.Context) {
 	c.JSON(http.StatusOK, resultado)
 
 }
+
+func (handler *ProductoHandler) GetListStockMinimum(c *gin.Context) {
+	resultado := handler.productoService.GetListStockMinimum()
+
+	c.JSON(http.StatusOK, resultado)
+}

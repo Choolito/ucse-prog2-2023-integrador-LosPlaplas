@@ -16,6 +16,10 @@ type ProductoRepositoryInterface interface {
 	GetProductos() ([]*model.Producto, error)
 	UpdateProducto(id string, producto model.Producto) (*mongo.UpdateResult, error)
 	DeleteProducto(id string) (*mongo.DeleteResult, error)
+
+	DiscountStock(id string, cantidad int) (*mongo.UpdateResult, error)
+
+	GetListStockMinimum() ([]*model.Producto, error)
 }
 
 type ProductoRepository struct {
@@ -85,4 +89,43 @@ func (pr *ProductoRepository) DeleteProducto(id string) (*mongo.DeleteResult, er
 
 	resultado, err := collection.DeleteOne(context.Background(), filtro)
 	return resultado, err
+}
+
+func (pr *ProductoRepository) DiscountStock(id string, cantidad int) (*mongo.UpdateResult, error) {
+	collection := pr.db.GetClient().Database("LosPlaplas").Collection("productos")
+
+	objectID := utils.GetObjectIDFromStringID(id)
+
+	filtro := bson.M{"_id": objectID}
+
+	update := bson.M{
+		"$inc": bson.M{"cantidadEnStock": -cantidad, "fechaActualizacion": time.Now()},
+	}
+
+	result, err := collection.UpdateOne(context.Background(), filtro, update)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func (pr *ProductoRepository) GetListStockMinimum() ([]*model.Producto, error) {
+	collection := pr.db.GetClient().Database("LosPlaplas").Collection("productos")
+	filtro := bson.M{"cantidadEnStock": bson.M{"$lte": "$stockMinimo"}}
+
+	cursor, err := collection.Find(context.TODO(), filtro)
+
+	defer cursor.Close(context.Background())
+
+	var productos []*model.Producto
+	for cursor.Next(context.Background()) {
+		var producto model.Producto
+		err := cursor.Decode(&producto)
+		if err != nil {
+			return nil, err
+		}
+		productos = append(productos, &producto)
+	}
+	return productos, err
 }

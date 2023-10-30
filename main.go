@@ -37,7 +37,9 @@ func mappingRoutes() {
 
 	groupProductos.POST("/", productoHandler.CreateProducto)
 	groupProductos.GET("/", productoHandler.GetProductos)
-	//Lista de productos con stock menor al mínimo. Se puede filtrar por tipo de producto.
+	//lista stock minimo
+	groupProductos.GET("/stockminimo", productoHandler.GetListStockMinimum)
+
 	groupProductos.PUT("/:id", productoHandler.UpdateProducto)
 	groupProductos.DELETE("/:id", productoHandler.DeleteProducto)
 
@@ -67,8 +69,10 @@ func mappingRoutes() {
 	groupEnvios := router.Group("/envios")
 	groupEnvios.Use(middlewares.CORSMiddleware())
 
-	groupEnvios.POST("/", enviosHandler.CreateEnvio)
+	groupEnvios.POST("/", enviosHandler.CreateShipping)
 	groupEnvios.PUT("/iniciar/:id", enviosHandler.StartTrip)
+	groupEnvios.PUT("/parada/:id", enviosHandler.GenerateStop)
+	groupEnvios.PUT("/finalizar/:id", enviosHandler.FinishTrip)
 }
 
 func dependencies() {

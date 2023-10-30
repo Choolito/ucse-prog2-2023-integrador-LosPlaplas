@@ -22,6 +22,7 @@ type PedidosRepositoryInterface interface {
 	//envio
 	GetPedidoForID(id string) (*model.Pedidos, error)
 	UpdatePedidoParaEnviar(id string) (*mongo.UpdateResult, error)
+	UpdatePedidoEnviado(id string) (*mongo.UpdateResult, error)
 }
 
 type PedidosRepository struct {
@@ -169,6 +170,24 @@ func (pr *PedidosRepository) UpdatePedidoParaEnviar(id string) (*mongo.UpdateRes
 	}
 
 	resultado, err := collecction.UpdateOne(context.Background(), filtro, update)
+
+	return resultado, err
+}
+
+func (pr *PedidosRepository) UpdatePedidoEnviado(id string) (*mongo.UpdateResult, error) {
+	collection := pr.db.GetClient().Database("LosPlaplas").Collection("pedidos")
+	objectID := utils.GetObjectIDFromStringID(id)
+
+	filtro := bson.M{"_id": objectID}
+
+	update := bson.M{
+		"$set": bson.M{
+			"estadoPedido":       "Enviado",
+			"fechaActualizacion": time.Now(),
+		},
+	}
+
+	resultado, err := collection.UpdateOne(context.Background(), filtro, update)
 
 	return resultado, err
 }
