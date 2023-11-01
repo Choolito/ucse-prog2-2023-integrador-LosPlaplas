@@ -71,3 +71,11 @@ func (handler *ProductoHandler) GetListStockMinimum(c *gin.Context) {
 
 	c.JSON(http.StatusOK, resultado)
 }
+
+func (handler *ProductoHandler) GetListFiltered(c *gin.Context) {
+	filter := c.Param("filtro")
+
+	resultado := handler.productoService.GetListFiltered(filter)
+
+	c.JSON(http.StatusOK, resultado)
+}

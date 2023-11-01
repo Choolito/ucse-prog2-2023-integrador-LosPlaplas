@@ -4,6 +4,7 @@ import (
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/dto"
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/model"
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/repositories"
+	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/utils"
 )
 
 type EnviosInterface interface {
@@ -12,6 +13,7 @@ type EnviosInterface interface {
 	StartTrip(id string) bool
 	GenerateStop(id string, parada dto.Parada) bool
 	FinishTrip(id string, paradaDestino dto.Parada) bool
+	GetShipping() []*dto.Envio
 }
 
 type EnviosService struct {
@@ -69,6 +71,18 @@ func (enviosService *EnviosService) CreateShipping(envio *dto.Envio) bool {
 	return true
 }
 
+func (enviosService *EnviosService) GetShipping() []*dto.Envio {
+	enviosDB, _ := enviosService.enviosRepository.GetShipping()
+
+	var envios []*dto.Envio
+	for _, envioDB := range enviosDB {
+		envio := dto.NewEnvio(*envioDB)
+		envios = append(envios, envio)
+	}
+
+	return envios
+}
+
 func (enviosService *EnviosService) StartTrip(id string) bool {
 	enviosService.enviosRepository.StartTrip(id)
 	return true
@@ -93,7 +107,8 @@ func (enviosService *EnviosService) FinishTrip(id string, paradaDestino dto.Para
 			enviosService.pedidosRepository.UpdatePedidoEnviado(pedido)
 			pedido, _ := enviosService.pedidosRepository.GetPedidoForID(pedido)
 			for _, producto := range pedido.ListaProductos {
-				enviosService.productoRepository.DiscountStock(producto.CodigoProducto, producto.Cantidad)
+				var idProducto = utils.GetStringIDFromObjectID(producto.IDProducto)
+				enviosService.productoRepository.DiscountStock(idProducto, producto.Cantidad)
 			}
 
 		}

@@ -36,6 +36,11 @@ func (enviosHandler *EnviosHandler) CreateShipping(c *gin.Context) {
 	c.JSON(http.StatusOK, resultado)
 }
 
+func (enviosHandler *EnviosHandler) GetShipping(c *gin.Context) {
+	envios := enviosHandler.enviosService.GetShipping()
+	c.JSON(http.StatusOK, envios)
+}
+
 func (enviosHandler *EnviosHandler) StartTrip(c *gin.Context) {
 	id := c.Param("id")
 
@@ -51,7 +56,10 @@ func (enviosHandler *EnviosHandler) GenerateStop(c *gin.Context) {
 
 	var parada dto.Parada
 
-	//verificar que no sea nulo
+	if err := c.Bind(&parada); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
 	resultado := enviosHandler.enviosService.GenerateStop(id, parada)
 
@@ -62,7 +70,10 @@ func (EnviosHandler *EnviosHandler) FinishTrip(c *gin.Context) {
 	id := c.Param("id")
 
 	var paradaDestino dto.Parada
-	//verificar que no sea nulo
+	if err := c.Bind(&paradaDestino); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
 	resultado := EnviosHandler.enviosService.FinishTrip(id, paradaDestino)
 

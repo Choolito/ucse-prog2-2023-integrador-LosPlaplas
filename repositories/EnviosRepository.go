@@ -18,6 +18,7 @@ type EnviosRepositoryInterface interface {
 	GenerateStop(id string, parada model.Parada) (*mongo.UpdateResult, error)
 	GetShippingForID(id string) (model.Envio, error)
 	FinishTrip(id string) (*mongo.UpdateResult, error)
+	GetShipping() ([]*model.Envio, error)
 }
 
 type EnviosRepository struct {
@@ -43,6 +44,26 @@ func (enviosRepository *EnviosRepository) CreateShipping(envio model.Envio) (*mo
 	return resultado, err
 }
 
+func (enviosRepository *EnviosRepository) GetShipping() ([]*model.Envio, error) {
+	collection := enviosRepository.db.GetClient().Database("LosPlaplas").Collection("envios")
+	filter := bson.M{}
+
+	cursor, err := collection.Find(context.TODO(), filter)
+
+	defer cursor.Close(context.Background())
+
+	var envios []*model.Envio
+	for cursor.Next(context.Background()) {
+		var envio model.Envio
+		err := cursor.Decode(&envio)
+		if err != nil {
+			return nil, err
+		}
+		envios = append(envios, &envio)
+	}
+	return envios, err
+}
+
 func (enviosRepository *EnviosRepository) StartTrip(id string) (*mongo.UpdateResult, error) {
 	collecction := enviosRepository.db.GetClient().Database("LosPlaplas").Collection("envios")
 	objectID := utils.GetObjectIDFromStringID(id)
@@ -57,7 +78,15 @@ func (enviosRepository *EnviosRepository) GenerateStop(id string, parada model.P
 	collection := enviosRepository.db.GetClient().Database("LosPlaplas").Collection("envios")
 	objectID := utils.GetObjectIDFromStringID(id)
 	filter := bson.M{"_id": objectID}
-	update := bson.M{"$push": bson.M{"paradas": parada, "fechaActualizacion": time.Now()}}
+
+	envio, _ := enviosRepository.GetShippingForID(id)
+
+	paradas := envio.Paradas
+	paradas = append(paradas, parada)
+
+	update := bson.M{
+		"$set": bson.M{"paradas": paradas, "fechaActualizacion": time.Now()},
+	}
 	resultado, err := collection.UpdateOne(context.Background(), filter, update)
 	return resultado, err
 }

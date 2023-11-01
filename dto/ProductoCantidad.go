@@ -1,8 +1,12 @@
 package dto
 
-import "github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/model"
+import (
+	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/model"
+	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/utils"
+)
 
 type ProductoCantidad struct {
+	IDProducto     string
 	CodigoProducto string
 	TipoProducto   string
 	Nombre         string
@@ -13,6 +17,7 @@ type ProductoCantidad struct {
 
 func NewProductoCantidad(productoCantidad model.ProductoCantidad) *ProductoCantidad {
 	return &ProductoCantidad{
+		IDProducto:     utils.GetStringIDFromObjectID(productoCantidad.IDProducto),
 		CodigoProducto: productoCantidad.CodigoProducto,
 		TipoProducto:   productoCantidad.TipoProducto,
 		Nombre:         productoCantidad.Nombre,
@@ -24,6 +29,7 @@ func NewProductoCantidad(productoCantidad model.ProductoCantidad) *ProductoCanti
 
 func (productoCantidad ProductoCantidad) GetModel() model.ProductoCantidad {
 	return model.ProductoCantidad{
+		IDProducto:     utils.GetObjectIDFromStringID(productoCantidad.IDProducto),
 		CodigoProducto: productoCantidad.CodigoProducto,
 		TipoProducto:   productoCantidad.TipoProducto,
 		Nombre:         productoCantidad.Nombre,
@@ -32,4 +38,3 @@ func (productoCantidad ProductoCantidad) GetModel() model.ProductoCantidad {
 		PesoUnitario:   productoCantidad.PesoUnitario,
 	}
 }
-

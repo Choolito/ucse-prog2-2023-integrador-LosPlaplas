@@ -16,12 +16,14 @@ type PedidosInterface interface {
 }
 
 type PedidosService struct {
-	pedidosRepository repositories.PedidosRepositoryInterface
+	pedidosRepository  repositories.PedidosRepositoryInterface
+	productoRepository repositories.ProductoRepositoryInterface
 }
 
-func NewPedidosService(pedidosRepository repositories.PedidosRepositoryInterface) *PedidosService {
+func NewPedidosService(pedidosRepository repositories.PedidosRepositoryInterface, productoRepository repositories.ProductoRepositoryInterface) *PedidosService {
 	return &PedidosService{
-		pedidosRepository: pedidosRepository,
+		pedidosRepository:  pedidosRepository,
+		productoRepository: productoRepository,
 	}
 }
 
@@ -30,6 +32,21 @@ func NewPedidosService(pedidosRepository repositories.PedidosRepositoryInterface
 //Metodo que devuelva []AceptadosElegidos que no superen el pesoMaximo --> Pasa a estado "Para Enviar"
 
 func (ps *PedidosService) CreatePedido(pedido *dto.Pedidos) bool {
+
+	var productosCantidad []dto.ProductoCantidad
+	for _, producto := range pedido.ListaProductos {
+		productoBuscado, _ := ps.productoRepository.GetProductoForID(producto.IDProducto)
+		var ProductoCantidad dto.ProductoCantidad
+		ProductoCantidad.IDProducto = producto.IDProducto
+		ProductoCantidad.CodigoProducto = productoBuscado.CodigoProducto
+		ProductoCantidad.TipoProducto = productoBuscado.TipoProducto
+		ProductoCantidad.Nombre = productoBuscado.Nombre
+		ProductoCantidad.Cantidad = producto.Cantidad
+		ProductoCantidad.PrecioUnitario = productoBuscado.PrecioUnitario
+		ProductoCantidad.PesoUnitario = productoBuscado.PesoUnitario
+		productosCantidad = append(productosCantidad, ProductoCantidad)
+	}
+	pedido.ListaProductos = productosCantidad
 	ps.pedidosRepository.CreatePedido(pedido.GetModel())
 	return true
 }
@@ -53,9 +70,11 @@ func (ps *PedidosService) UpdatePedido(id string, pedido *dto.Pedidos) bool {
 }
 
 func (ps *PedidosService) DeletePedido(id string) bool {
-	ps.pedidosRepository.DeletePedido(id)
-
-	return true
+	resultado, _ := ps.pedidosRepository.DeletePedido(id)
+	if resultado.ModifiedCount != 0 {
+		return true
+	}
+	return false
 }
 
 func (ps *PedidosService) GetPedidosPendientes() []*dto.Pedidos {
@@ -71,7 +90,9 @@ func (ps *PedidosService) GetPedidosPendientes() []*dto.Pedidos {
 }
 
 func (ps *PedidosService) UpdatePedidoAceptado(id string) bool {
-	ps.pedidosRepository.UpdatePedidoAceptado(id)
-
-	return true
+	resultado, _ := ps.pedidosRepository.UpdatePedidoAceptado(id)
+	if resultado.ModifiedCount != 0 {
+		return true
+	}
+	return false
 }

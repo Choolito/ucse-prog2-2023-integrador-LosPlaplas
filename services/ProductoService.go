@@ -12,6 +12,7 @@ type ProductoInterface interface {
 	UpdateProducto(id string, producto *dto.Producto) bool
 	DeleteProducto(id string) bool
 	GetListStockMinimum() []*dto.Producto
+	GetListFiltered(filtro string) []*dto.Producto
 }
 
 type ProductoService struct {
@@ -53,7 +54,21 @@ func (ps *ProductoService) DeleteProducto(id string) bool {
 }
 
 func (ps *ProductoService) GetListStockMinimum() []*dto.Producto {
-	productosDB, _ := ps.productoRepository.GetListStockMinimum()
+	productosDB, _ := ps.productoRepository.GetProductos()
+
+	var productos []*dto.Producto
+	for _, productoDB := range productosDB {
+		producto := dto.NewProducto(*productoDB)
+		if producto.CantidadEnStock < producto.StockMinimo {
+			productos = append(productos, producto)
+		}
+	}
+
+	return productos
+}
+
+func (ps *ProductoService) GetListFiltered(filtro string) []*dto.Producto {
+	productosDB, _ := ps.productoRepository.GetListFiltered(filtro)
 
 	var productos []*dto.Producto
 	for _, productoDB := range productosDB {

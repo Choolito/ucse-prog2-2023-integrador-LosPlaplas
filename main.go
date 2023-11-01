@@ -31,48 +31,38 @@ func main() {
 
 func mappingRoutes() {
 
+	router.Use(middlewares.CORSMiddleware())
 	//Productos CRUD
-	groupProductos := router.Group("/productos")
-	groupProductos.Use(middlewares.CORSMiddleware())
-
-	groupProductos.POST("/", productoHandler.CreateProducto)
-	groupProductos.GET("/", productoHandler.GetProductos)
+	router.POST("/productos", productoHandler.CreateProducto)
+	router.GET("/productos", productoHandler.GetProductos)
 	//lista stock minimo
-	groupProductos.GET("/stockminimo", productoHandler.GetListStockMinimum)
-
-	groupProductos.PUT("/:id", productoHandler.UpdateProducto)
-	groupProductos.DELETE("/:id", productoHandler.DeleteProducto)
+	router.GET("/productos/stockminimo", productoHandler.GetListStockMinimum)
+	router.GET("/productos/filtrado/:filtro", productoHandler.GetListFiltered)
+	router.PUT("/productos/:id", productoHandler.UpdateProducto)
+	router.DELETE("/productos/:id", productoHandler.DeleteProducto)
 
 	//Camiones CRUD
-	groupCamiones := router.Group("/camiones")
-	groupCamiones.Use(middlewares.CORSMiddleware())
-
-	groupCamiones.POST("/", camionHandler.CreateCamion)
-	groupCamiones.GET("/", camionHandler.GetCamiones)
-	groupCamiones.PUT("/:id", camionHandler.UpdateCamion)
-	groupCamiones.DELETE("/:id", camionHandler.DeleteCamion)
+	router.POST("/camiones", camionHandler.CreateCamion)
+	router.GET("/camiones", camionHandler.GetCamiones)
+	router.PUT("/camiones/:id", camionHandler.UpdateCamion)
+	router.DELETE("/camiones/:id", camionHandler.DeleteCamion)
 
 	//Pedidos CRUD
-	groupPedidos := router.Group("/pedidos")
-	groupPedidos.Use(middlewares.CORSMiddleware())
-
-	groupPedidos.POST("/", pedidosHandler.CreatePedido)
-	groupPedidos.GET("/", pedidosHandler.GetPedidos)
+	router.POST("/pedidos", pedidosHandler.CreatePedido)
+	router.GET("/pedidos", pedidosHandler.GetPedidos)
 	//Se puede filtrar por código de envío, estado, rango de fecha de creación.
-	groupPedidos.PUT("/:id", pedidosHandler.UpdatePedido)
-	groupPedidos.PUT("/cancelar/:id", pedidosHandler.DeletePedido)
+	router.PUT("/pedidos/:id", pedidosHandler.UpdatePedido)
+	router.PUT("/pedidos/cancelar/:id", pedidosHandler.DeletePedido)
 	//Lista pedidos pendientes
-	groupPedidos.GET("/pendientes", pedidosHandler.GetPedidosPendientes)
-	groupPedidos.PUT("/aceptar/:id", pedidosHandler.UpdatePedidoAceptado)
+	router.GET("/pedidos/pendientes", pedidosHandler.GetPedidosPendientes)
+	router.PUT("/pedidos/aceptar/:id", pedidosHandler.UpdatePedidoAceptado)
 
 	//Envios
-	groupEnvios := router.Group("/envios")
-	groupEnvios.Use(middlewares.CORSMiddleware())
-
-	groupEnvios.POST("/", enviosHandler.CreateShipping)
-	groupEnvios.PUT("/iniciar/:id", enviosHandler.StartTrip)
-	groupEnvios.PUT("/parada/:id", enviosHandler.GenerateStop)
-	groupEnvios.PUT("/finalizar/:id", enviosHandler.FinishTrip)
+	router.POST("/envios", enviosHandler.CreateShipping)
+	router.GET("/envios", enviosHandler.GetShipping)
+	router.PUT("/envios/iniciar/:id", enviosHandler.StartTrip)
+	router.PUT("/envios/parada/:id", enviosHandler.GenerateStop)
+	router.PUT("/envios/finalizar/:id", enviosHandler.FinishTrip)
 }
 
 func dependencies() {
@@ -98,7 +88,7 @@ func dependencies() {
 	var pedidosRepository repositories.PedidosRepositoryInterface
 	var pedidosService services.PedidosInterface
 	pedidosRepository = repositories.NewPedidosRepository(database)
-	pedidosService = services.NewPedidosService(pedidosRepository)
+	pedidosService = services.NewPedidosService(pedidosRepository, productoRepository)
 	pedidosHandler = handlers.NewPedidosHandler(pedidosService)
 
 	//Envios

@@ -19,7 +19,10 @@ type ProductoRepositoryInterface interface {
 
 	DiscountStock(id string, cantidad int) (*mongo.UpdateResult, error)
 
-	GetListStockMinimum() ([]*model.Producto, error)
+	//GetListStockMinimum() ([]*model.Producto, error)
+	GetListFiltered(filtro string) ([]*model.Producto, error)
+
+	GetProductoForID(id string) (*model.Producto, error)
 }
 
 type ProductoRepository struct {
@@ -60,6 +63,21 @@ func (pr *ProductoRepository) GetProductos() ([]*model.Producto, error) {
 		productos = append(productos, &producto)
 	}
 	return productos, err
+}
+
+func (pr *ProductoRepository) GetProductoForID(id string) (*model.Producto, error) {
+	collection := pr.db.GetClient().Database("LosPlaplas").Collection("productos")
+
+	objectID := utils.GetObjectIDFromStringID(id)
+
+	filtro := bson.M{"_id": objectID}
+
+	var producto model.Producto
+	err := collection.FindOne(context.Background(), filtro).Decode(&producto)
+	if err != nil {
+		return nil, err
+	}
+	return &producto, nil
 }
 
 func (pr *ProductoRepository) UpdateProducto(id string, producto model.Producto) (*mongo.UpdateResult, error) {
@@ -110,11 +128,31 @@ func (pr *ProductoRepository) DiscountStock(id string, cantidad int) (*mongo.Upd
 	return result, nil
 }
 
-func (pr *ProductoRepository) GetListStockMinimum() ([]*model.Producto, error) {
-	collection := pr.db.GetClient().Database("LosPlaplas").Collection("productos")
-	filtro := bson.M{"cantidadEnStock": bson.M{"$lte": "$stockMinimo"}}
+// func (pr *ProductoRepository) GetListStockMinimum() ([]*model.Producto, error) {
+// 	collection := pr.db.GetClient().Database("LosPlaplas").Collection("productos")
+// 	filtro := bson.M{"cantidadEnStock": bson.M{"$lte": "stockMinimo"}}
 
-	cursor, err := collection.Find(context.TODO(), filtro)
+// 	cursor, err := collection.Find(context.TODO(), filtro)
+
+// 	defer cursor.Close(context.Background())
+
+// 	var productos []*model.Producto
+// 	for cursor.Next(context.Background()) {
+// 		var producto model.Producto
+// 		err := cursor.Decode(&producto)
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 		productos = append(productos, &producto)
+// 	}
+// 	return productos, err
+// }
+
+func (pr *ProductoRepository) GetListFiltered(filtro string) ([]*model.Producto, error) {
+	collection := pr.db.GetClient().Database("LosPlaplas").Collection("productos")
+	filtroDB := bson.M{"tipoProducto": filtro}
+
+	cursor, err := collection.Find(context.Background(), filtroDB)
 
 	defer cursor.Close(context.Background())
 

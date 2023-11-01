@@ -144,7 +144,10 @@ func (pr *PedidosRepository) UpdatePedidoAceptado(id string) (*mongo.UpdateResul
 	collection := pr.db.GetClient().Database("LosPlaplas").Collection("pedidos")
 	objectID := utils.GetObjectIDFromStringID(id)
 
-	filtro := bson.M{"_id": objectID}
+	filtro := bson.M{
+		"_id":          objectID,
+		"estadoPedido": "Pendiente",
+	}
 
 	update := bson.M{
 		"$set": bson.M{

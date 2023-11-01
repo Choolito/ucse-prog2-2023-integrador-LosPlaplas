@@ -1,6 +1,6 @@
 package model
 
 type Parada struct {
-	Ciudad       string
-	KmRecorridos int
+	Ciudad       string `bson:"ciudad"`
+	KmRecorridos int    `bson:"kmRecorridos"`
 }
