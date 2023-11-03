@@ -1,0 +1,256 @@
+/* Reglas de css para los documentos */
+body{
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+}
+
+table {
+    width: 100%;    
+}
+
+table tr th {    
+    text-align: center;
+    font-weight: bold;
+}
+
+table tr td {
+    font-family: 'Trebuchet MS', serif;
+    font-weight: 300;
+}
+
+table tr th, table tr td {
+    padding:10px;
+    border: 1px solid #CCC;    
+}
+
+.acciones {
+    text-align: center;
+    width: 15%;
+}
+
+.filtros{
+    background: #f3f3f3;
+    padding: 25px;
+    margin-bottom: 20px;
+}
+
+.botonera {
+    background: #f3f3f3;
+    margin-bottom: 20px;
+    padding: 25px;
+}
+.botonera label{
+    display: inline-block;
+    margin-right: 20px; 
+    text-decoration: none;
+    color: #333; /* Color del texto */
+    font-weight: bold;
+}
+.botonera a {
+    display: inline-block;
+    margin-right: 20px; 
+    text-decoration: none;
+    color: #333; /* Color del texto */
+    font-weight: bold;
+}
+
+/* Estilos para el encabezado con la imagen y el nombre de la distribuidora */
+.encabezado {
+    background-color: #3498db;
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+}
+
+/* Estilos para la imagen del logo */
+.logo {
+    width: 50px; /* Ajusta el tamaño según sea necesario */
+    margin-right: 10px;
+}
+
+/* Estilos para el nombre de la distribuidora */
+.nombre-distribuidora {
+    margin: 0;
+}
+
+/* Estilos para la barra de navegación */
+.barra-navegacion {
+    background-color: #2980b9;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+}
+
+/* Estilos para los enlaces de la barra de navegación */
+.barra-navegacion a {
+    text-decoration: none;
+    color: white;
+    padding: 10px 20px;
+    transition: 0.3s;
+}
+
+/* Cambio de estilo al pasar el cursor sobre los enlaces */
+.barra-navegacion a:hover {
+    background-color: #1c638e;
+}
+
+
+
+/* Estilos para la imagen */
+.imagen {
+    width: 150px; /* Ancho del logo */
+    height: auto;
+    float: left; /* Hace que la imagen se coloque a la izquierda */
+    margin-right: 10px; /* Espaciado a la derecha de la imagen */
+}
+
+/* Estilos para el contenedor */
+.encabezado_titulo {
+    display: flex;
+    justify-content: space-between; /* Coloca los elementos al principio y al final del contenedor */
+    align-items: center; /* Centra verticalmente los elementos */
+    padding: 10px; /* Ajusta el espacio interno según sea necesario */
+    background-color: #3498db; /* Azul claro como color de fondo */
+    color: white; /* Texto blanco para un buen contraste */
+    padding: 20px; /* Ajusta el espacio interno según sea necesario */
+}
+
+/* Estilos para la imagen */
+.imagen {
+    margin-right: 10px; /* Espaciado a la derecha de la imagen */
+}
+
+/* Estilos para el texto del título */
+.titulo {
+    margin: 0; /* Elimina el margen predeterminado del encabezado */
+}
+
+.filtro-container {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.filtro-title h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.filtro-filters {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.filtro-item {
+    margin-right: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.filtro-item label {
+    margin-right: 5px;
+    font-weight: bold;
+    color: #555;
+    font-size: 15.4px; /* Tamaño de fuente reducido */
+}
+
+.filtro-item input[type="text"],
+.filtro-item select{
+    width: 190px; /* Ancho reducido de los elementos de entrada */
+    padding: 6.6px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 15.4px; /* Tamaño de fuente reducido */
+}
+.filtro-item input[type="date"] {
+    width: 125px; /* Ancho reducido de los elementos de entrada */
+    padding: 6.6px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 15.4px; /* Tamaño de fuente reducido */
+}
+
+.filtro-buttons {
+    margin-top: 10px;
+}
+
+.filtro-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 8.8px 17.6px; /* Tamaño de los botones reducido */
+    cursor: pointer;
+    border-radius: 5px;
+    margin-right: 10px;
+    transition: background-color 0.3s ease;
+    font-size: 15.4px; /* Tamaño de fuente reducido */
+}
+
+.filtro-button.secondary {
+    background-color: #ff6666;
+}
+
+.filtro-button:hover {
+    background-color: #45a049;
+}
+
+.filtro-button.secondary:hover {
+    background-color: #ff1a1a;
+}
+
+.container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.formulario {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px 0;
+    width: 300px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"] {
+    width: calc(100% - 20px);
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    font-size: 14px;
+}
+
+button:hover {
+    background-color: #45a049;
+}

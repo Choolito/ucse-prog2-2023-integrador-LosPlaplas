@@ -67,7 +67,7 @@ func (enviosRepository *EnviosRepository) GetShipping() ([]*model.Envio, error) 
 func (enviosRepository *EnviosRepository) StartTrip(id string) (*mongo.UpdateResult, error) {
 	collecction := enviosRepository.db.GetClient().Database("LosPlaplas").Collection("envios")
 	objectID := utils.GetObjectIDFromStringID(id)
-	filter := bson.M{"_id": objectID}
+	filter := bson.M{"_id": objectID, "estado": "A despachar"}
 	update := bson.M{"$set": bson.M{"estado": "En ruta", "fechaActualizacion": time.Now()}}
 	resultado, err := collecction.UpdateOne(context.Background(), filter, update)
 
@@ -103,7 +103,7 @@ func (enviosRepository *EnviosRepository) GetShippingForID(id string) (model.Env
 func (EnviosRepository *EnviosRepository) FinishTrip(id string) (*mongo.UpdateResult, error) {
 	collection := EnviosRepository.db.GetClient().Database("LosPlaplas").Collection("envios")
 	objectID := utils.GetObjectIDFromStringID(id)
-	filter := bson.M{"_id": objectID}
+	filter := bson.M{"_id": objectID, "estado": "En ruta"}
 	update := bson.M{"$set": bson.M{"estado": "Despachado", "fechaActualizacion": time.Now()}}
 	resultado, err := collection.UpdateOne(context.Background(), filter, update)
 	return resultado, err

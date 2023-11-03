@@ -67,6 +67,7 @@ func (handler *ProductoHandler) DeleteProducto(c *gin.Context) {
 }
 
 func (handler *ProductoHandler) GetListStockMinimum(c *gin.Context) {
+
 	resultado := handler.productoService.GetListStockMinimum()
 
 	c.JSON(http.StatusOK, resultado)
@@ -76,6 +77,14 @@ func (handler *ProductoHandler) GetListFiltered(c *gin.Context) {
 	filter := c.Param("filtro")
 
 	resultado := handler.productoService.GetListFiltered(filter)
+
+	c.JSON(http.StatusOK, resultado)
+}
+
+func (handler *ProductoHandler) GetProductoForID(c *gin.Context) {
+	id := c.Param("id")
+
+	resultado := handler.productoService.GetProductoForID(id)
 
 	c.JSON(http.StatusOK, resultado)
 }

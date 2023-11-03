@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="origin">
+    <title>Nuevo Producto</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <link href="/web/styles_form.css" rel="stylesheet" >
+</head>
+<body>
+
+    <div class="formulario">
+        <h2>Dar de Alta Producto Alimenticio</h2>
+        <form>
+            <div class="form-group">
+                <label for="codigo-producto">Código de Producto:</label>
+                <input type="text" id="codigo-producto" name="codigo-producto" required>
+            </div>
+            <div class="form-group">
+                <label for="TipoProducto">Tipo de Producto:</label>
+                <select id="tipo" name="tipo" required>
+                    <option value=""></option>
+                    <option value="Golosinas">Golosinas</option>
+                    <option value="Bebidas">Bebidas</option>
+                    <option value="Cigarrillos">Cigarrillos</option>
+                    <option value="Comestibles">Comestibles</option>
+                    <option value="Higiene y salud">Higiene y salud</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="Nombre">Nombre:</label>
+                <input type="text" id="nombre" name="nombre" required>
+            </div>
+            <div class="form-group">
+                <label for="PrecioUnitario">Precio:</label>
+                <input type="number" id="precio" name="precio" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label for="PesoUnitario">Peso (g):</label>
+                <input type="number" id="peso" name="peso" required>
+            </div>
+            <div class="form-group">
+                <label for="StockMinimo">Stock Mínimo:</label>
+                <input type="number" id="stock-minimo" name="stock-minimo" required>
+            </div>
+            <div class="form-group">
+                <label for="CantidadEnStock">Cantidad en Stock:</label>
+                <input type="number" id="stock-actual" name="stock-actual" required>
+            </div>
+            <button type="submit" id="guardar-button">Guardar Producto</button>
+            <button type="button" class="cancelar" onclick="window.location.href='/web/productos/index_producto.html';">Cancelar</button>
+        </form>
+    </div>
+
+    <div class="botonera">
+        <!-- Contenido de la botonera -->
+    </div>
+    <script src="form.js"></script>
+    <script src="/web/request.js"></script>
+</body>
+</html>

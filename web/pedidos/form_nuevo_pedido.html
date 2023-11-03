@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="origin">
+    <title>Nuevo Pedido</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <link href="/web/styles_form.css" rel="stylesheet">
+</head>
+<body>
+    <div class="formulario">
+        <h2 class="titulo">Dar de Alta Pedido</h2>
+        <form>
+            <button type="sumbit">Guardar pedido</button>
+            <button type="button" class="cancelar" onclick="window.location.href='/web/pedidos/index_pedido.html';">Cancelar</button>
+            <!-- Campos existentes -->
+            <div class="form-group">
+                <label for="ciudad">Ciudad Destino:</label>
+                <input type="text" id="ciudad" name="ciudad" required>
+            </div>
+        </form>
+        <!-- Tabla de productos -->
+        <table id="elementosTable" cellspacing="0" cellpadding="0">
+            <thead>
+                <tr>
+                    <th>Codigo producto</th>
+                    <th>Nombre</th>
+                    <th>Tipo de producto</th>
+                    <th>Precio unitario</th>
+                    <th>Cantidad</th>
+                    <th>Seleccionar</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Filas de datos de productos -->
+            </tbody>
+            <tfoot>
+                <!-- Filas de pie -->
+            </tfoot>
+        </table>
+    </div>
+    <script src="/web/request.js"></script>
+    <script src="form.js"></script>
+</body>
+</html>

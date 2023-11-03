@@ -30,13 +30,14 @@ func main() {
 }
 
 func mappingRoutes() {
-
 	router.Use(middlewares.CORSMiddleware())
 	//Productos CRUD
 	router.POST("/productos", productoHandler.CreateProducto)
 	router.GET("/productos", productoHandler.GetProductos)
+	router.GET("/productos/:id", productoHandler.GetProductoForID)
 	//lista stock minimo
 	router.GET("/productos/stockminimo", productoHandler.GetListStockMinimum)
+	//Falta usar este
 	router.GET("/productos/filtrado/:filtro", productoHandler.GetListFiltered)
 	router.PUT("/productos/:id", productoHandler.UpdateProducto)
 	router.DELETE("/productos/:id", productoHandler.DeleteProducto)
@@ -44,6 +45,7 @@ func mappingRoutes() {
 	//Camiones CRUD
 	router.POST("/camiones", camionHandler.CreateCamion)
 	router.GET("/camiones", camionHandler.GetCamiones)
+	router.GET("/camiones/:id", camionHandler.GetCamionForID)
 	router.PUT("/camiones/:id", camionHandler.UpdateCamion)
 	router.DELETE("/camiones/:id", camionHandler.DeleteCamion)
 

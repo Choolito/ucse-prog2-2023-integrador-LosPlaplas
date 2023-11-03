@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuevo Camión</title>
+    <meta name="referrer" content="origin">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <link href="/web/styles_form.css" rel="stylesheet"> <!-- Reemplaza "styles_form.css" con la ruta correcta a tu archivo de estilos -->
+</head>
+
+<body>
+    <div class="formulario">
+        <h2>Nuevo Camión</h2>
+        <form action="/" method="post" id="form">
+            <div class="form-group">
+                <label for="Patente">Patente:</label>
+                <input type="text" name="Patente" id="Patente" required>
+            </div>
+            <div class="form-group">
+                <label for="PesoMaximo">Peso Máximo:</label>
+                <input type="text" name="PesoMaximo" id="PesoMaximo" required>
+            </div>
+            <div class="form-group">
+                <label for="CostoPorKm">Costo Por Km:</label>
+                <input type="text" name="CostoPorKm" id="CostoPorKm" required>
+            </div>
+            <button type="submit" id="guardar-button">Guardar Camion</button>
+            <button type="button" class="cancelar" onclick="window.location.href='/web/camiones/index_camion.html';">Cancelar</button>
+        </form>
+    </div>
+
+    <div class="botonera">
+        <!-- Contenido de la botonera -->
+    </div>
+    <script src="form.js"></script>
+    <script src="/web/request.js"></script>
+</body>
+
+</html>

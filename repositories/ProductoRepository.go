@@ -14,15 +14,13 @@ type ProductoRepositoryInterface interface {
 	//metodos
 	CreateProducto(producto model.Producto) (*mongo.InsertOneResult, error)
 	GetProductos() ([]*model.Producto, error)
+	GetProductoForID(id string) (*model.Producto, error)
 	UpdateProducto(id string, producto model.Producto) (*mongo.UpdateResult, error)
 	DeleteProducto(id string) (*mongo.DeleteResult, error)
 
 	DiscountStock(id string, cantidad int) (*mongo.UpdateResult, error)
 
-	//GetListStockMinimum() ([]*model.Producto, error)
 	GetListFiltered(filtro string) ([]*model.Producto, error)
-
-	GetProductoForID(id string) (*model.Producto, error)
 }
 
 type ProductoRepository struct {
@@ -47,9 +45,9 @@ func (pr *ProductoRepository) CreateProducto(producto model.Producto) (*mongo.In
 
 func (pr *ProductoRepository) GetProductos() ([]*model.Producto, error) {
 	collection := pr.db.GetClient().Database("LosPlaplas").Collection("productos")
-	filtro := bson.M{}
+	filtroDB := bson.M{}
 
-	cursor, err := collection.Find(context.TODO(), filtro)
+	cursor, err := collection.Find(context.TODO(), filtroDB)
 
 	defer cursor.Close(context.Background())
 
@@ -127,26 +125,6 @@ func (pr *ProductoRepository) DiscountStock(id string, cantidad int) (*mongo.Upd
 
 	return result, nil
 }
-
-// func (pr *ProductoRepository) GetListStockMinimum() ([]*model.Producto, error) {
-// 	collection := pr.db.GetClient().Database("LosPlaplas").Collection("productos")
-// 	filtro := bson.M{"cantidadEnStock": bson.M{"$lte": "stockMinimo"}}
-
-// 	cursor, err := collection.Find(context.TODO(), filtro)
-
-// 	defer cursor.Close(context.Background())
-
-// 	var productos []*model.Producto
-// 	for cursor.Next(context.Background()) {
-// 		var producto model.Producto
-// 		err := cursor.Decode(&producto)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-// 		productos = append(productos, &producto)
-// 	}
-// 	return productos, err
-// }
 
 func (pr *ProductoRepository) GetListFiltered(filtro string) ([]*model.Producto, error) {
 	collection := pr.db.GetClient().Database("LosPlaplas").Collection("productos")

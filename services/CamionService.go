@@ -11,6 +11,7 @@ type CamionInterface interface {
 	GetCamiones() []*dto.Camion
 	UpdateCamion(id string, camion *dto.Camion) bool
 	DeleteCamion(id string) bool
+	GetCamionForID(id string) *dto.Camion
 }
 
 type CamionService struct {
@@ -43,6 +44,14 @@ func (cs *CamionService) GetCamiones() []*dto.Camion {
 	}
 
 	return camiones
+}
+
+func (cs *CamionService) GetCamionForID(id string) *dto.Camion {
+	camionDB, _ := cs.camionRepository.GetCamionForID(id)
+
+	camion := dto.NewCamion(*camionDB)
+
+	return camion
 }
 
 func (cs *CamionService) UpdateCamion(id string, camion *dto.Camion) bool {

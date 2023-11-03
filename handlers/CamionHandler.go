@@ -39,6 +39,14 @@ func (ch *CamionHandler) GetCamiones(c *gin.Context) {
 	c.JSON(http.StatusOK, camiones)
 }
 
+func (ch *CamionHandler) GetCamionForID(c *gin.Context) {
+	id := c.Param("id")
+
+	camion := ch.camionService.GetCamionForID(id)
+
+	c.JSON(http.StatusOK, camion)
+}
+
 func (ch *CamionHandler) UpdateCamion(c *gin.Context) {
 	id := c.Param("id")
 	var camion dto.Camion
