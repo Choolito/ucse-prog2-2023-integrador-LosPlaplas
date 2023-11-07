@@ -20,7 +20,7 @@ func NewCamionHandler(camionService services.CamionInterface) *CamionHandler {
 
 //CRUD de Camion
 
-func (ch *CamionHandler) CreateCamion(c *gin.Context) {
+func (ch *CamionHandler) CrearCamion(c *gin.Context) {
 	var camion dto.Camion
 
 	if err := c.ShouldBindJSON(&camion); err != nil {
@@ -28,26 +28,26 @@ func (ch *CamionHandler) CreateCamion(c *gin.Context) {
 		return
 	}
 
-	resultado := ch.camionService.CreateCamion(&camion)
+	resultado := ch.camionService.CrearCamion(&camion)
 
 	c.JSON(http.StatusOK, resultado)
 }
 
-func (ch *CamionHandler) GetCamiones(c *gin.Context) {
-	camiones := ch.camionService.GetCamiones()
+func (ch *CamionHandler) ObtenerCamiones(c *gin.Context) {
+	camiones := ch.camionService.ObtenerCamiones()
 
 	c.JSON(http.StatusOK, camiones)
 }
 
-func (ch *CamionHandler) GetCamionForID(c *gin.Context) {
+func (ch *CamionHandler) ObtenerCamionPorID(c *gin.Context) {
 	id := c.Param("id")
 
-	camion := ch.camionService.GetCamionForID(id)
+	camion := ch.camionService.ObtenerCamionPorID(id)
 
 	c.JSON(http.StatusOK, camion)
 }
 
-func (ch *CamionHandler) UpdateCamion(c *gin.Context) {
+func (ch *CamionHandler) ActualizarCamion(c *gin.Context) {
 	id := c.Param("id")
 	var camion dto.Camion
 
@@ -56,15 +56,15 @@ func (ch *CamionHandler) UpdateCamion(c *gin.Context) {
 		return
 	}
 
-	resultado := ch.camionService.UpdateCamion(id, &camion)
+	resultado := ch.camionService.ActualizarCamion(id, &camion)
 
 	c.JSON(http.StatusOK, resultado)
 }
 
-func (ch *CamionHandler) DeleteCamion(c *gin.Context) {
+func (ch *CamionHandler) EliminarCamion(c *gin.Context) {
 	id := c.Param("id")
 
-	resultado := ch.camionService.DeleteCamion(id)
+	resultado := ch.camionService.EliminarCamion(id)
 
 	c.JSON(http.StatusOK, resultado)
 }

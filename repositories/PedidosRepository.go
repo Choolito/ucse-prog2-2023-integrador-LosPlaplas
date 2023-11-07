@@ -12,17 +12,17 @@ import (
 
 type PedidosRepositoryInterface interface {
 	//metodos
-	CreatePedido(pedido model.Pedidos) (*mongo.InsertOneResult, error)
-	GetPedidos() ([]*model.Pedidos, error)
-	UpdatePedido(id string, pedido model.Pedidos) (*mongo.UpdateResult, error)
-	DeletePedido(id string) (*mongo.UpdateResult, error)
-	GetPedidosPendientes() ([]*model.Pedidos, error)
-	UpdatePedidoAceptado(id string) (*mongo.UpdateResult, error)
+	CrearPedido(pedido model.Pedidos) (*mongo.InsertOneResult, error)
+	ObtenerPedidos() ([]*model.Pedidos, error)
+	ActualizarPedido(id string, pedido model.Pedidos) (*mongo.UpdateResult, error)
+	EliminarPedido(id string) (*mongo.UpdateResult, error)
+	ObtenerPedidosPendientes() ([]*model.Pedidos, error)
+	ActualizarPedidoAceptado(id string) (*mongo.UpdateResult, error)
 
 	//envio
-	GetPedidoForID(id string) (*model.Pedidos, error)
-	UpdatePedidoParaEnviar(id string) (*mongo.UpdateResult, error)
-	UpdatePedidoEnviado(id string) (*mongo.UpdateResult, error)
+	ObtenerPedidoPorID(id string) (*model.Pedidos, error)
+	ActualizarPedidoParaEnviar(id string) (*mongo.UpdateResult, error)
+	ActualizarPedidoEnviado(id string) (*mongo.UpdateResult, error)
 }
 
 type PedidosRepository struct {
@@ -37,7 +37,7 @@ func NewPedidosRepository(db DB) *PedidosRepository {
 
 //CRUD de Pedidos
 
-func (pr *PedidosRepository) CreatePedido(pedido model.Pedidos) (*mongo.InsertOneResult, error) {
+func (pr *PedidosRepository) CrearPedido(pedido model.Pedidos) (*mongo.InsertOneResult, error) {
 	collection := pr.db.GetClient().Database("LosPlaplas").Collection("pedidos")
 	pedido.FechaCreacion = time.Now()
 	pedido.FechaActualizacion = time.Now()
@@ -46,7 +46,7 @@ func (pr *PedidosRepository) CreatePedido(pedido model.Pedidos) (*mongo.InsertOn
 	return resultado, err
 }
 
-func (pr *PedidosRepository) GetPedidos() ([]*model.Pedidos, error) {
+func (pr *PedidosRepository) ObtenerPedidos() ([]*model.Pedidos, error) {
 	collection := pr.db.GetClient().Database("LosPlaplas").Collection("pedidos")
 	filtro := bson.M{}
 
@@ -66,7 +66,7 @@ func (pr *PedidosRepository) GetPedidos() ([]*model.Pedidos, error) {
 	return pedidos, err
 }
 
-func (pr *PedidosRepository) GetPedidoForID(id string) (*model.Pedidos, error) {
+func (pr *PedidosRepository) ObtenerPedidoPorID(id string) (*model.Pedidos, error) {
 	collection := pr.db.GetClient().Database("LosPlaplas").Collection("pedidos")
 
 	objectID := utils.GetObjectIDFromStringID(id)
@@ -78,7 +78,7 @@ func (pr *PedidosRepository) GetPedidoForID(id string) (*model.Pedidos, error) {
 	return &pedido, err
 }
 
-func (pr *PedidosRepository) UpdatePedido(id string, pedido model.Pedidos) (*mongo.UpdateResult, error) {
+func (pr *PedidosRepository) ActualizarPedido(id string, pedido model.Pedidos) (*mongo.UpdateResult, error) {
 	collection := pr.db.GetClient().Database("LosPlaplas").Collection("pedidos")
 
 	objectID := utils.GetObjectIDFromStringID(id)
@@ -96,7 +96,7 @@ func (pr *PedidosRepository) UpdatePedido(id string, pedido model.Pedidos) (*mon
 	return resultado, err
 }
 
-func (pr *PedidosRepository) DeletePedido(id string) (*mongo.UpdateResult, error) {
+func (pr *PedidosRepository) EliminarPedido(id string) (*mongo.UpdateResult, error) {
 	collection := pr.db.GetClient().Database("LosPlaplas").Collection("pedidos")
 
 	objectID := utils.GetObjectIDFromStringID(id)
@@ -119,7 +119,7 @@ func (pr *PedidosRepository) DeletePedido(id string) (*mongo.UpdateResult, error
 }
 
 // Lista pedidos pendientes
-func (pr *PedidosRepository) GetPedidosPendientes() ([]*model.Pedidos, error) {
+func (pr *PedidosRepository) ObtenerPedidosPendientes() ([]*model.Pedidos, error) {
 	collection := pr.db.GetClient().Database("LosPlaplas").Collection("pedidos")
 	filtro := bson.M{"estadoPedido": "Pendiente"}
 
@@ -140,7 +140,7 @@ func (pr *PedidosRepository) GetPedidosPendientes() ([]*model.Pedidos, error) {
 }
 
 // Aceptar pedido
-func (pr *PedidosRepository) UpdatePedidoAceptado(id string) (*mongo.UpdateResult, error) {
+func (pr *PedidosRepository) ActualizarPedidoAceptado(id string) (*mongo.UpdateResult, error) {
 	collection := pr.db.GetClient().Database("LosPlaplas").Collection("pedidos")
 	objectID := utils.GetObjectIDFromStringID(id)
 
@@ -159,7 +159,7 @@ func (pr *PedidosRepository) UpdatePedidoAceptado(id string) (*mongo.UpdateResul
 	return resultado, err
 }
 
-func (pr *PedidosRepository) UpdatePedidoParaEnviar(id string) (*mongo.UpdateResult, error) {
+func (pr *PedidosRepository) ActualizarPedidoParaEnviar(id string) (*mongo.UpdateResult, error) {
 	collecction := pr.db.GetClient().Database("LosPlaplas").Collection("pedidos")
 	objectID := utils.GetObjectIDFromStringID(id)
 
@@ -177,7 +177,7 @@ func (pr *PedidosRepository) UpdatePedidoParaEnviar(id string) (*mongo.UpdateRes
 	return resultado, err
 }
 
-func (pr *PedidosRepository) UpdatePedidoEnviado(id string) (*mongo.UpdateResult, error) {
+func (pr *PedidosRepository) ActualizarPedidoEnviado(id string) (*mongo.UpdateResult, error) {
 	collection := pr.db.GetClient().Database("LosPlaplas").Collection("pedidos")
 	objectID := utils.GetObjectIDFromStringID(id)
 

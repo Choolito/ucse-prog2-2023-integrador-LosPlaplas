@@ -9,11 +9,11 @@ import (
 
 type EnviosInterface interface {
 	//metodos
-	CreateShipping(envio *dto.Envio) bool
-	StartTrip(id string) bool
-	GenerateStop(id string, parada dto.Parada) bool
-	FinishTrip(id string, paradaDestino dto.Parada) bool
-	GetShipping() []*dto.Envio
+	CrearEnvio(envio *dto.Envio) bool
+	IniciarViajeEnvio(id string) bool
+	GenerarParadaEnvio(id string, parada dto.Parada) bool
+	FinalizarViajeEnvio(id string, paradaDestino dto.Parada) bool
+	ObtenerEnvio() []*dto.Envio
 }
 
 type EnviosService struct {
@@ -38,14 +38,14 @@ func NewEnviosService(enviosRepository repositories.EnviosRepositoryInterface, p
 //Se genere un envio
 //Envio pasa a estado "A despachar".
 
-func (enviosService *EnviosService) CreateShipping(envio *dto.Envio) bool {
-	camion, _ := enviosService.camionRepository.GetCamionForID(envio.IDCamion)
+func (enviosService *EnviosService) CrearEnvio(envio *dto.Envio) bool {
+	camion, _ := enviosService.camionRepository.ObtenerCamionPorID(envio.IDCamion)
 	pesoMaximo := camion.PesoMaximo
 
 	pedidos := envio.Pedidos
 	var pedidosEnvio []*model.Pedidos
 	for _, pedido := range pedidos {
-		pedidoBuscado, _ := enviosService.pedidosRepository.GetPedidoForID(pedido)
+		pedidoBuscado, _ := enviosService.pedidosRepository.ObtenerPedidoPorID(pedido)
 		pedidosEnvio = append(pedidosEnvio, pedidoBuscado)
 	}
 
@@ -63,16 +63,16 @@ func (enviosService *EnviosService) CreateShipping(envio *dto.Envio) bool {
 
 	//Pasar a estado "Para enviar"
 	for _, pedido := range pedidosEnvio {
-		enviosService.pedidosRepository.UpdatePedidoParaEnviar(pedido.ID.Hex())
+		enviosService.pedidosRepository.ActualizarPedidoParaEnviar(pedido.ID.Hex())
 	}
 
-	enviosService.enviosRepository.CreateShipping(envio.GetModel())
+	enviosService.enviosRepository.CrearEnvio(envio.GetModel())
 
 	return true
 }
 
-func (enviosService *EnviosService) GetShipping() []*dto.Envio {
-	enviosDB, _ := enviosService.enviosRepository.GetShipping()
+func (enviosService *EnviosService) ObtenerEnvio() []*dto.Envio {
+	enviosDB, _ := enviosService.enviosRepository.ObtenerEnvio()
 
 	var envios []*dto.Envio
 	for _, envioDB := range enviosDB {
@@ -83,32 +83,32 @@ func (enviosService *EnviosService) GetShipping() []*dto.Envio {
 	return envios
 }
 
-func (enviosService *EnviosService) StartTrip(id string) bool {
-	enviosService.enviosRepository.StartTrip(id)
+func (enviosService *EnviosService) IniciarViajeEnvio(id string) bool {
+	enviosService.enviosRepository.IniciarViajeEnvio(id)
 	return true
 }
 
-func (enviosService *EnviosService) GenerateStop(id string, parada dto.Parada) bool {
-	envio, _ := enviosService.enviosRepository.GetShippingForID(id)
+func (enviosService *EnviosService) GenerarParadaEnvio(id string, parada dto.Parada) bool {
+	envio, _ := enviosService.enviosRepository.ObtenerEnvioPorID(id)
 	if envio.Estado == "En ruta" {
-		enviosService.enviosRepository.GenerateStop(id, parada.GetModel())
+		enviosService.enviosRepository.GenerarParadaEnvio(id, parada.GetModel())
 		return true
 	}
 
 	return false
 }
 
-func (enviosService *EnviosService) FinishTrip(id string, paradaDestino dto.Parada) bool {
-	envio, _ := enviosService.enviosRepository.GetShippingForID(id)
+func (enviosService *EnviosService) FinalizarViajeEnvio(id string, paradaDestino dto.Parada) bool {
+	envio, _ := enviosService.enviosRepository.ObtenerEnvioPorID(id)
 	if envio.Estado == "En ruta" {
-		enviosService.enviosRepository.GenerateStop(id, paradaDestino.GetModel())
-		enviosService.enviosRepository.FinishTrip(id)
+		enviosService.enviosRepository.GenerarParadaEnvio(id, paradaDestino.GetModel())
+		enviosService.enviosRepository.FinalizarViajeEnvio(id)
 		for _, pedido := range envio.Pedidos {
-			enviosService.pedidosRepository.UpdatePedidoEnviado(pedido)
-			pedido, _ := enviosService.pedidosRepository.GetPedidoForID(pedido)
+			enviosService.pedidosRepository.ActualizarPedidoEnviado(pedido)
+			pedido, _ := enviosService.pedidosRepository.ObtenerPedidoPorID(pedido)
 			for _, producto := range pedido.ListaProductos {
 				var idProducto = utils.GetStringIDFromObjectID(producto.IDProducto)
-				enviosService.productoRepository.DiscountStock(idProducto, producto.Cantidad)
+				enviosService.productoRepository.DescontarStock(idProducto, producto.Cantidad)
 			}
 
 		}

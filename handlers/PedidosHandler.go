@@ -23,7 +23,7 @@ func NewPedidosHandler(pedidosService services.PedidosInterface) *PedidosHandler
 //Si el pedido es aceptado, no puede ser cancelado.
 //Se valida stock manualmente, y pasa a estado "Aceptado"
 
-func (ph *PedidosHandler) CreatePedido(c *gin.Context) {
+func (ph *PedidosHandler) CrearPedido(c *gin.Context) {
 	var pedido dto.Pedidos
 
 	if err := c.ShouldBindJSON(&pedido); err != nil {
@@ -31,17 +31,17 @@ func (ph *PedidosHandler) CreatePedido(c *gin.Context) {
 		return
 	}
 
-	resultado := ph.pedidosService.CreatePedido(&pedido)
+	resultado := ph.pedidosService.CrearPedido(&pedido)
 
 	c.JSON(http.StatusOK, resultado)
 }
 
-func (ph *PedidosHandler) GetPedidos(c *gin.Context) {
-	pedidos := ph.pedidosService.GetPedidos()
+func (ph *PedidosHandler) ObtenerPedidos(c *gin.Context) {
+	pedidos := ph.pedidosService.ObtenerPedidos()
 	c.JSON(http.StatusOK, pedidos)
 }
 
-func (ph *PedidosHandler) UpdatePedido(c *gin.Context) {
+func (ph *PedidosHandler) ActualizarPedido(c *gin.Context) {
 	id := c.Param("id")
 	var pedido dto.Pedidos
 
@@ -50,28 +50,28 @@ func (ph *PedidosHandler) UpdatePedido(c *gin.Context) {
 		return
 	}
 
-	resultado := ph.pedidosService.UpdatePedido(id, &pedido)
+	resultado := ph.pedidosService.ActualizarPedido(id, &pedido)
 
 	c.JSON(http.StatusOK, resultado)
 }
 
 // Este delete es un put
-func (ph *PedidosHandler) DeletePedido(c *gin.Context) {
+func (ph *PedidosHandler) EliminarPedido(c *gin.Context) {
 	id := c.Param("id")
 
-	resultado := ph.pedidosService.DeletePedido(id)
+	resultado := ph.pedidosService.EliminarPedido(id)
 
 	c.JSON(http.StatusOK, resultado)
 }
 
-func (ph *PedidosHandler) GetPedidosPendientes(c *gin.Context) {
-	pedidos := ph.pedidosService.GetPedidosPendientes()
+func (ph *PedidosHandler) ObtenerPedidosPendientes(c *gin.Context) {
+	pedidos := ph.pedidosService.ObtenerPedidosPendientes()
 	c.JSON(http.StatusOK, pedidos)
 }
-func (ph *PedidosHandler) UpdatePedidoAceptado(c *gin.Context) {
+func (ph *PedidosHandler) ActualizarPedidoAceptado(c *gin.Context) {
 	id := c.Param("id")
 
-	resultado := ph.pedidosService.UpdatePedidoAceptado(id)
+	resultado := ph.pedidosService.ActualizarPedidoAceptado(id)
 
 	c.JSON(http.StatusOK, resultado)
 }

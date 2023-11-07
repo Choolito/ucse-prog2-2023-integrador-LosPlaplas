@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/clients"
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/handlers"
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/middlewares"
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/repositories"
@@ -30,41 +31,49 @@ func main() {
 }
 
 func mappingRoutes() {
+
+	var authClient clients.AuthClientInterface
+	authClient = clients.NewAuthClient()
+	authMiddleware := middlewares.NewAuthMiddleware(authClient)
+
+	//Uso del middleware para todas las rutas del grupo
+	router.Use(authMiddleware.ValidateToken)
+
 	router.Use(middlewares.CORSMiddleware())
 	//Productos CRUD
-	router.POST("/productos", productoHandler.CreateProducto)
-	router.GET("/productos", productoHandler.GetProductos)
-	router.GET("/productos/:id", productoHandler.GetProductoForID)
+	router.POST("/productos", productoHandler.CrearProducto)
+	router.GET("/productos", productoHandler.ObtenerProductos)
+	router.GET("/productos/:id", productoHandler.ObtenerProductoPorID)
 	//lista stock minimo
-	router.GET("/productos/stockminimo", productoHandler.GetListStockMinimum)
+	router.GET("/productos/stockminimo", productoHandler.ObtenerListaConStockMinimo)
 	//Falta usar este
-	router.GET("/productos/filtrado/:filtro", productoHandler.GetListFiltered)
-	router.PUT("/productos/:id", productoHandler.UpdateProducto)
-	router.DELETE("/productos/:id", productoHandler.DeleteProducto)
+	router.GET("/productos/filtrado/:filtro", productoHandler.ObtenerListaFiltrada)
+	router.PUT("/productos/:id", productoHandler.ActualizarProducto)
+	router.DELETE("/productos/:id", productoHandler.EliminarProducto)
 
 	//Camiones CRUD
-	router.POST("/camiones", camionHandler.CreateCamion)
-	router.GET("/camiones", camionHandler.GetCamiones)
-	router.GET("/camiones/:id", camionHandler.GetCamionForID)
-	router.PUT("/camiones/:id", camionHandler.UpdateCamion)
-	router.DELETE("/camiones/:id", camionHandler.DeleteCamion)
+	router.POST("/camiones", camionHandler.CrearCamion)
+	router.GET("/camiones", camionHandler.ObtenerCamiones)
+	router.GET("/camiones/:id", camionHandler.ObtenerCamionPorID)
+	router.PUT("/camiones/:id", camionHandler.ActualizarCamion)
+	router.DELETE("/camiones/:id", camionHandler.EliminarCamion)
 
 	//Pedidos CRUD
-	router.POST("/pedidos", pedidosHandler.CreatePedido)
-	router.GET("/pedidos", pedidosHandler.GetPedidos)
+	router.POST("/pedidos", pedidosHandler.CrearPedido)
+	router.GET("/pedidos", pedidosHandler.ObtenerPedidos)
 	//Se puede filtrar por código de envío, estado, rango de fecha de creación.
-	router.PUT("/pedidos/:id", pedidosHandler.UpdatePedido)
-	router.PUT("/pedidos/cancelar/:id", pedidosHandler.DeletePedido)
+	router.PUT("/pedidos/:id", pedidosHandler.ActualizarPedido)
+	router.PUT("/pedidos/cancelar/:id", pedidosHandler.EliminarPedido)
 	//Lista pedidos pendientes
-	router.GET("/pedidos/pendientes", pedidosHandler.GetPedidosPendientes)
-	router.PUT("/pedidos/aceptar/:id", pedidosHandler.UpdatePedidoAceptado)
+	router.GET("/pedidos/pendientes", pedidosHandler.ObtenerPedidosPendientes)
+	router.PUT("/pedidos/aceptar/:id", pedidosHandler.ActualizarPedidoAceptado)
 
 	//Envios
-	router.POST("/envios", enviosHandler.CreateShipping)
-	router.GET("/envios", enviosHandler.GetShipping)
-	router.PUT("/envios/iniciar/:id", enviosHandler.StartTrip)
-	router.PUT("/envios/parada/:id", enviosHandler.GenerateStop)
-	router.PUT("/envios/finalizar/:id", enviosHandler.FinishTrip)
+	router.POST("/envios", enviosHandler.CrearEnvio)
+	router.GET("/envios", enviosHandler.ObtenerEnvio)
+	router.PUT("/envios/iniciar/:id", enviosHandler.IniciarViajeEnvio)
+	router.PUT("/envios/parada/:id", enviosHandler.GenerarParadaEnvio)
+	router.PUT("/envios/finalizar/:id", enviosHandler.FinalizarViajeEnvio)
 }
 
 func dependencies() {

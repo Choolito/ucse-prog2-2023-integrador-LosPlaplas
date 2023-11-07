@@ -20,7 +20,7 @@ func NewProductoHandler(productoService services.ProductoInterface) *ProductoHan
 
 //CRUD de Producto
 
-func (handler *ProductoHandler) CreateProducto(c *gin.Context) {
+func (handler *ProductoHandler) CrearProducto(c *gin.Context) {
 	var producto dto.Producto
 
 	if err := c.ShouldBindJSON(&producto); err != nil {
@@ -28,21 +28,21 @@ func (handler *ProductoHandler) CreateProducto(c *gin.Context) {
 		return
 	}
 
-	resultado := handler.productoService.CreateProducto(&producto)
+	resultado := handler.productoService.CrearProducto(&producto)
 
 	c.JSON(http.StatusOK, resultado)
 
 }
 
-func (handler *ProductoHandler) GetProductos(c *gin.Context) {
+func (handler *ProductoHandler) ObtenerProductos(c *gin.Context) {
 
-	resultado := handler.productoService.GetProductos()
+	resultado := handler.productoService.ObtenerProductos()
 
 	c.JSON(http.StatusOK, resultado)
 
 }
 
-func (handler *ProductoHandler) UpdateProducto(c *gin.Context) {
+func (handler *ProductoHandler) ActualizarProducto(c *gin.Context) {
 	id := c.Param("id")
 	var producto dto.Producto
 
@@ -51,40 +51,40 @@ func (handler *ProductoHandler) UpdateProducto(c *gin.Context) {
 		return
 	}
 
-	resultado := handler.productoService.UpdateProducto(id, &producto)
+	resultado := handler.productoService.ActualizarProducto(id, &producto)
 
 	c.JSON(http.StatusOK, resultado)
 
 }
 
-func (handler *ProductoHandler) DeleteProducto(c *gin.Context) {
+func (handler *ProductoHandler) EliminarProducto(c *gin.Context) {
 	id := c.Param("id")
 
-	resultado := handler.productoService.DeleteProducto(id)
+	resultado := handler.productoService.EliminarProducto(id)
 
 	c.JSON(http.StatusOK, resultado)
 
 }
 
-func (handler *ProductoHandler) GetListStockMinimum(c *gin.Context) {
+func (handler *ProductoHandler) ObtenerListaConStockMinimo(c *gin.Context) {
 
-	resultado := handler.productoService.GetListStockMinimum()
+	resultado := handler.productoService.ObtenerListaConStockMinimo()
 
 	c.JSON(http.StatusOK, resultado)
 }
 
-func (handler *ProductoHandler) GetListFiltered(c *gin.Context) {
+func (handler *ProductoHandler) ObtenerListaFiltrada(c *gin.Context) {
 	filter := c.Param("filtro")
 
-	resultado := handler.productoService.GetListFiltered(filter)
+	resultado := handler.productoService.ObtenerListaFiltrada(filter)
 
 	c.JSON(http.StatusOK, resultado)
 }
 
-func (handler *ProductoHandler) GetProductoForID(c *gin.Context) {
+func (handler *ProductoHandler) ObtenerProductoPorID(c *gin.Context) {
 	id := c.Param("id")
 
-	resultado := handler.productoService.GetProductoForID(id)
+	resultado := handler.productoService.ObtenerProductoPorID(id)
 
 	c.JSON(http.StatusOK, resultado)
 }

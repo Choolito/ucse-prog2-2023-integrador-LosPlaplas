@@ -12,12 +12,12 @@ import (
 
 type CamionRepositoryInterface interface {
 	//metodos
-	CreateCamion(camion model.Camion) (*mongo.InsertOneResult, error)
-	GetCamiones() ([]*model.Camion, error)
-	UpdateCamion(id string, camion model.Camion) (*mongo.UpdateResult, error)
-	DeleteCamion(id string) (*mongo.DeleteResult, error)
+	CrearCamion(camion model.Camion) (*mongo.InsertOneResult, error)
+	ObtenerCamiones() ([]*model.Camion, error)
+	ActualizarCamion(id string, camion model.Camion) (*mongo.UpdateResult, error)
+	EliminarCamion(id string) (*mongo.DeleteResult, error)
 	//envios
-	GetCamionForID(id string) (*model.Camion, error)
+	ObtenerCamionPorID(id string) (*model.Camion, error)
 }
 
 type CamionRepository struct {
@@ -32,7 +32,7 @@ func NewCamionRepository(db DB) *CamionRepository {
 
 //CRUD de Camion
 
-func (cr *CamionRepository) CreateCamion(camion model.Camion) (*mongo.InsertOneResult, error) {
+func (cr *CamionRepository) CrearCamion(camion model.Camion) (*mongo.InsertOneResult, error) {
 	collection := cr.db.GetClient().Database("LosPlaplas").Collection("camiones")
 	camion.FechaCreacion = time.Now()
 	camion.FechaActualizacion = time.Now()
@@ -40,7 +40,7 @@ func (cr *CamionRepository) CreateCamion(camion model.Camion) (*mongo.InsertOneR
 	return resultado, err
 }
 
-func (cr *CamionRepository) GetCamiones() ([]*model.Camion, error) {
+func (cr *CamionRepository) ObtenerCamiones() ([]*model.Camion, error) {
 	collection := cr.db.GetClient().Database("LosPlaplas").Collection("camiones")
 	filtro := bson.M{}
 
@@ -60,7 +60,7 @@ func (cr *CamionRepository) GetCamiones() ([]*model.Camion, error) {
 	return camiones, err
 }
 
-func (cr *CamionRepository) GetCamionForID(id string) (*model.Camion, error) {
+func (cr *CamionRepository) ObtenerCamionPorID(id string) (*model.Camion, error) {
 	collection := cr.db.GetClient().Database("LosPlaplas").Collection("camiones")
 
 	objectID := utils.GetObjectIDFromStringID(id)
@@ -73,7 +73,7 @@ func (cr *CamionRepository) GetCamionForID(id string) (*model.Camion, error) {
 	return &camion, err
 }
 
-func (cr *CamionRepository) UpdateCamion(id string, camion model.Camion) (*mongo.UpdateResult, error) {
+func (cr *CamionRepository) ActualizarCamion(id string, camion model.Camion) (*mongo.UpdateResult, error) {
 	collection := cr.db.GetClient().Database("LosPlaplas").Collection("camiones")
 
 	objectID := utils.GetObjectIDFromStringID(id)
@@ -90,7 +90,7 @@ func (cr *CamionRepository) UpdateCamion(id string, camion model.Camion) (*mongo
 	return resultado, err
 }
 
-func (cr *CamionRepository) DeleteCamion(id string) (*mongo.DeleteResult, error) {
+func (cr *CamionRepository) EliminarCamion(id string) (*mongo.DeleteResult, error) {
 	collection := cr.db.GetClient().Database("LosPlaplas").Collection("camiones")
 
 	objectID := utils.GetObjectIDFromStringID(id)

@@ -7,12 +7,12 @@ import (
 
 type PedidosInterface interface {
 	//metodos
-	CreatePedido(pedido *dto.Pedidos) bool
-	GetPedidos() []*dto.Pedidos
-	UpdatePedido(id string, pedido *dto.Pedidos) bool
-	DeletePedido(id string) bool
-	GetPedidosPendientes() []*dto.Pedidos
-	UpdatePedidoAceptado(id string) bool
+	CrearPedido(pedido *dto.Pedidos) bool
+	ObtenerPedidos() []*dto.Pedidos
+	ActualizarPedido(id string, pedido *dto.Pedidos) bool
+	EliminarPedido(id string) bool
+	ObtenerPedidosPendientes() []*dto.Pedidos
+	ActualizarPedidoAceptado(id string) bool
 }
 
 type PedidosService struct {
@@ -31,11 +31,11 @@ func NewPedidosService(pedidosRepository repositories.PedidosRepositoryInterface
 
 //Metodo que devuelva []AceptadosElegidos que no superen el pesoMaximo --> Pasa a estado "Para Enviar"
 
-func (ps *PedidosService) CreatePedido(pedido *dto.Pedidos) bool {
+func (ps *PedidosService) CrearPedido(pedido *dto.Pedidos) bool {
 
 	var productosCantidad []dto.ProductoCantidad
 	for _, producto := range pedido.ListaProductos {
-		productoBuscado, _ := ps.productoRepository.GetProductoForID(producto.IDProducto)
+		productoBuscado, _ := ps.productoRepository.ObtenerProductoPorID(producto.IDProducto)
 		var ProductoCantidad dto.ProductoCantidad
 		ProductoCantidad.IDProducto = producto.IDProducto
 		ProductoCantidad.CodigoProducto = productoBuscado.CodigoProducto
@@ -47,12 +47,12 @@ func (ps *PedidosService) CreatePedido(pedido *dto.Pedidos) bool {
 		productosCantidad = append(productosCantidad, ProductoCantidad)
 	}
 	pedido.ListaProductos = productosCantidad
-	ps.pedidosRepository.CreatePedido(pedido.GetModel())
+	ps.pedidosRepository.CrearPedido(pedido.GetModel())
 	return true
 }
 
-func (ps *PedidosService) GetPedidos() []*dto.Pedidos {
-	pedidosDB, _ := ps.pedidosRepository.GetPedidos()
+func (ps *PedidosService) ObtenerPedidos() []*dto.Pedidos {
+	pedidosDB, _ := ps.pedidosRepository.ObtenerPedidos()
 
 	var pedidos []*dto.Pedidos
 	for _, pedidoDB := range pedidosDB {
@@ -63,22 +63,22 @@ func (ps *PedidosService) GetPedidos() []*dto.Pedidos {
 	return pedidos
 }
 
-func (ps *PedidosService) UpdatePedido(id string, pedido *dto.Pedidos) bool {
-	ps.pedidosRepository.UpdatePedido(id, pedido.GetModel())
+func (ps *PedidosService) ActualizarPedido(id string, pedido *dto.Pedidos) bool {
+	ps.pedidosRepository.ActualizarPedido(id, pedido.GetModel())
 
 	return true
 }
 
-func (ps *PedidosService) DeletePedido(id string) bool {
-	resultado, _ := ps.pedidosRepository.DeletePedido(id)
+func (ps *PedidosService) EliminarPedido(id string) bool {
+	resultado, _ := ps.pedidosRepository.EliminarPedido(id)
 	if resultado.ModifiedCount != 0 {
 		return true
 	}
 	return false
 }
 
-func (ps *PedidosService) GetPedidosPendientes() []*dto.Pedidos {
-	pedidosDB, _ := ps.pedidosRepository.GetPedidosPendientes()
+func (ps *PedidosService) ObtenerPedidosPendientes() []*dto.Pedidos {
+	pedidosDB, _ := ps.pedidosRepository.ObtenerPedidosPendientes()
 
 	var pedidos []*dto.Pedidos
 	for _, pedidoDB := range pedidosDB {
@@ -89,8 +89,8 @@ func (ps *PedidosService) GetPedidosPendientes() []*dto.Pedidos {
 	return pedidos
 }
 
-func (ps *PedidosService) UpdatePedidoAceptado(id string) bool {
-	resultado, _ := ps.pedidosRepository.UpdatePedidoAceptado(id)
+func (ps *PedidosService) ActualizarPedidoAceptado(id string) bool {
+	resultado, _ := ps.pedidosRepository.ActualizarPedidoAceptado(id)
 	if resultado.ModifiedCount != 0 {
 		return true
 	}

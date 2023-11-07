@@ -12,15 +12,15 @@ import (
 
 type ProductoRepositoryInterface interface {
 	//metodos
-	CreateProducto(producto model.Producto) (*mongo.InsertOneResult, error)
-	GetProductos() ([]*model.Producto, error)
-	GetProductoForID(id string) (*model.Producto, error)
-	UpdateProducto(id string, producto model.Producto) (*mongo.UpdateResult, error)
-	DeleteProducto(id string) (*mongo.DeleteResult, error)
+	CrearProducto(producto model.Producto) (*mongo.InsertOneResult, error)
+	ObtenerProductos() ([]*model.Producto, error)
+	ObtenerProductoPorID(id string) (*model.Producto, error)
+	ActualizarProducto(id string, producto model.Producto) (*mongo.UpdateResult, error)
+	EliminarProducto(id string) (*mongo.DeleteResult, error)
 
-	DiscountStock(id string, cantidad int) (*mongo.UpdateResult, error)
+	DescontarStock(id string, cantidad int) (*mongo.UpdateResult, error)
 
-	GetListFiltered(filtro string) ([]*model.Producto, error)
+	ObtenerListaFiltrada(filtro string) ([]*model.Producto, error)
 }
 
 type ProductoRepository struct {
@@ -35,7 +35,7 @@ func NewProductoRepository(db DB) *ProductoRepository {
 
 //CRUD
 
-func (pr *ProductoRepository) CreateProducto(producto model.Producto) (*mongo.InsertOneResult, error) {
+func (pr *ProductoRepository) CrearProducto(producto model.Producto) (*mongo.InsertOneResult, error) {
 	collection := pr.db.GetClient().Database("LosPlaplas").Collection("productos")
 	producto.FechaCreacion = time.Now()
 	producto.FechaActualizacion = time.Now()
@@ -43,7 +43,7 @@ func (pr *ProductoRepository) CreateProducto(producto model.Producto) (*mongo.In
 	return resultado, err
 }
 
-func (pr *ProductoRepository) GetProductos() ([]*model.Producto, error) {
+func (pr *ProductoRepository) ObtenerProductos() ([]*model.Producto, error) {
 	collection := pr.db.GetClient().Database("LosPlaplas").Collection("productos")
 	filtroDB := bson.M{}
 
@@ -63,7 +63,7 @@ func (pr *ProductoRepository) GetProductos() ([]*model.Producto, error) {
 	return productos, err
 }
 
-func (pr *ProductoRepository) GetProductoForID(id string) (*model.Producto, error) {
+func (pr *ProductoRepository) ObtenerProductoPorID(id string) (*model.Producto, error) {
 	collection := pr.db.GetClient().Database("LosPlaplas").Collection("productos")
 
 	objectID := utils.GetObjectIDFromStringID(id)
@@ -78,7 +78,7 @@ func (pr *ProductoRepository) GetProductoForID(id string) (*model.Producto, erro
 	return &producto, nil
 }
 
-func (pr *ProductoRepository) UpdateProducto(id string, producto model.Producto) (*mongo.UpdateResult, error) {
+func (pr *ProductoRepository) ActualizarProducto(id string, producto model.Producto) (*mongo.UpdateResult, error) {
 	collection := pr.db.GetClient().Database("LosPlaplas").Collection("productos")
 
 	objectID := utils.GetObjectIDFromStringID(id)
@@ -96,7 +96,7 @@ func (pr *ProductoRepository) UpdateProducto(id string, producto model.Producto)
 	return resultado, err
 }
 
-func (pr *ProductoRepository) DeleteProducto(id string) (*mongo.DeleteResult, error) {
+func (pr *ProductoRepository) EliminarProducto(id string) (*mongo.DeleteResult, error) {
 	collection := pr.db.GetClient().Database("LosPlaplas").Collection("productos")
 
 	objectID := utils.GetObjectIDFromStringID(id)
@@ -107,7 +107,7 @@ func (pr *ProductoRepository) DeleteProducto(id string) (*mongo.DeleteResult, er
 	return resultado, err
 }
 
-func (pr *ProductoRepository) DiscountStock(id string, cantidad int) (*mongo.UpdateResult, error) {
+func (pr *ProductoRepository) DescontarStock(id string, cantidad int) (*mongo.UpdateResult, error) {
 	collection := pr.db.GetClient().Database("LosPlaplas").Collection("productos")
 
 	objectID := utils.GetObjectIDFromStringID(id)
@@ -126,7 +126,7 @@ func (pr *ProductoRepository) DiscountStock(id string, cantidad int) (*mongo.Upd
 	return result, nil
 }
 
-func (pr *ProductoRepository) GetListFiltered(filtro string) ([]*model.Producto, error) {
+func (pr *ProductoRepository) ObtenerListaFiltrada(filtro string) ([]*model.Producto, error) {
 	collection := pr.db.GetClient().Database("LosPlaplas").Collection("productos")
 	filtroDB := bson.M{"tipoProducto": filtro}
 
