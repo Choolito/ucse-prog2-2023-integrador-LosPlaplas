@@ -7,12 +7,12 @@ import (
 
 type PedidosInterface interface {
 	//metodos
-	CrearPedido(pedido *dto.Pedidos) bool
-	ObtenerPedidos() []*dto.Pedidos
-	ActualizarPedido(id string, pedido *dto.Pedidos) bool
-	EliminarPedido(id string) bool
-	ObtenerPedidosPendientes() []*dto.Pedidos
-	ActualizarPedidoAceptado(id string) bool
+	CrearPedido(pedido *dto.Pedidos) error
+	ObtenerPedidos() ([]*dto.Pedidos, error)
+	ActualizarPedido(id string, pedido *dto.Pedidos) error
+	EliminarPedido(id string) error
+	ObtenerPedidosPendientes() ([]*dto.Pedidos, error)
+	ActualizarPedidoAceptado(id string) error
 }
 
 type PedidosService struct {
@@ -31,7 +31,7 @@ func NewPedidosService(pedidosRepository repositories.PedidosRepositoryInterface
 
 //Metodo que devuelva []AceptadosElegidos que no superen el pesoMaximo --> Pasa a estado "Para Enviar"
 
-func (ps *PedidosService) CrearPedido(pedido *dto.Pedidos) bool {
+func (ps *PedidosService) CrearPedido(pedido *dto.Pedidos) error {
 
 	var productosCantidad []dto.ProductoCantidad
 	for _, producto := range pedido.ListaProductos {
@@ -47,12 +47,12 @@ func (ps *PedidosService) CrearPedido(pedido *dto.Pedidos) bool {
 		productosCantidad = append(productosCantidad, ProductoCantidad)
 	}
 	pedido.ListaProductos = productosCantidad
-	ps.pedidosRepository.CrearPedido(pedido.GetModel())
-	return true
+	_, err := ps.pedidosRepository.CrearPedido(pedido.GetModel())
+	return err
 }
 
-func (ps *PedidosService) ObtenerPedidos() []*dto.Pedidos {
-	pedidosDB, _ := ps.pedidosRepository.ObtenerPedidos()
+func (ps *PedidosService) ObtenerPedidos() ([]*dto.Pedidos, error) {
+	pedidosDB, err := ps.pedidosRepository.ObtenerPedidos()
 
 	var pedidos []*dto.Pedidos
 	for _, pedidoDB := range pedidosDB {
@@ -60,25 +60,27 @@ func (ps *PedidosService) ObtenerPedidos() []*dto.Pedidos {
 		pedidos = append(pedidos, pedido)
 	}
 
-	return pedidos
+	return pedidos, err
 }
 
-func (ps *PedidosService) ActualizarPedido(id string, pedido *dto.Pedidos) bool {
-	ps.pedidosRepository.ActualizarPedido(id, pedido.GetModel())
+func (ps *PedidosService) ActualizarPedido(id string, pedido *dto.Pedidos) error {
+	_, err := ps.pedidosRepository.ActualizarPedido(id, pedido.GetModel())
 
-	return true
+	return err
 }
 
-func (ps *PedidosService) EliminarPedido(id string) bool {
-	resultado, _ := ps.pedidosRepository.EliminarPedido(id)
-	if resultado.ModifiedCount != 0 {
-		return true
-	}
-	return false
+func (ps *PedidosService) EliminarPedido(id string) error {
+	_, err := ps.pedidosRepository.EliminarPedido(id)
+	// if resultado.ModifiedCount != 0 {
+	// 	return true
+	// }
+	// return false
+
+	return err
 }
 
-func (ps *PedidosService) ObtenerPedidosPendientes() []*dto.Pedidos {
-	pedidosDB, _ := ps.pedidosRepository.ObtenerPedidosPendientes()
+func (ps *PedidosService) ObtenerPedidosPendientes() ([]*dto.Pedidos, error) {
+	pedidosDB, err := ps.pedidosRepository.ObtenerPedidosPendientes()
 
 	var pedidos []*dto.Pedidos
 	for _, pedidoDB := range pedidosDB {
@@ -86,13 +88,14 @@ func (ps *PedidosService) ObtenerPedidosPendientes() []*dto.Pedidos {
 		pedidos = append(pedidos, pedido)
 	}
 
-	return pedidos
+	return pedidos, err
 }
 
-func (ps *PedidosService) ActualizarPedidoAceptado(id string) bool {
-	resultado, _ := ps.pedidosRepository.ActualizarPedidoAceptado(id)
-	if resultado.ModifiedCount != 0 {
-		return true
-	}
-	return false
+func (ps *PedidosService) ActualizarPedidoAceptado(id string) error {
+	_, err := ps.pedidosRepository.ActualizarPedidoAceptado(id)
+	// if resultado.ModifiedCount != 0 {
+	// 	return true
+	// }
+	// return false
+	return err
 }

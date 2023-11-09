@@ -28,16 +28,23 @@ func (handler *ProductoHandler) CrearProducto(c *gin.Context) {
 		return
 	}
 
-	resultado := handler.productoService.CrearProducto(&producto)
+	err := handler.productoService.CrearProducto(&producto)
 
-	c.JSON(http.StatusOK, resultado)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"mensaje": "Producto creado exitosamente"})
 
 }
 
 func (handler *ProductoHandler) ObtenerProductos(c *gin.Context) {
 
-	resultado := handler.productoService.ObtenerProductos()
+	resultado, err := handler.productoService.ObtenerProductos()
 
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+	}
 	c.JSON(http.StatusOK, resultado)
 
 }
@@ -51,40 +58,57 @@ func (handler *ProductoHandler) ActualizarProducto(c *gin.Context) {
 		return
 	}
 
-	resultado := handler.productoService.ActualizarProducto(id, &producto)
+	err := handler.productoService.ActualizarProducto(id, &producto)
 
-	c.JSON(http.StatusOK, resultado)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
+
+	c.JSON(http.StatusOK, gin.H{"mensaje": "Producto actualizado exitosamente"})
 
 }
 
 func (handler *ProductoHandler) EliminarProducto(c *gin.Context) {
 	id := c.Param("id")
 
-	resultado := handler.productoService.EliminarProducto(id)
+	err := handler.productoService.EliminarProducto(id)
 
-	c.JSON(http.StatusOK, resultado)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
+
+	c.JSON(http.StatusOK, gin.H{"mensaje": "Producto eliminado exitosamente"})
 
 }
 
 func (handler *ProductoHandler) ObtenerListaConStockMinimo(c *gin.Context) {
 
-	resultado := handler.productoService.ObtenerListaConStockMinimo()
+	resultado, err := handler.productoService.ObtenerListaConStockMinimo()
 
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+	}
 	c.JSON(http.StatusOK, resultado)
 }
 
 func (handler *ProductoHandler) ObtenerListaFiltrada(c *gin.Context) {
 	filter := c.Param("filtro")
 
-	resultado := handler.productoService.ObtenerListaFiltrada(filter)
+	resultado, err := handler.productoService.ObtenerListaFiltrada(filter)
 
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
 	c.JSON(http.StatusOK, resultado)
 }
 
 func (handler *ProductoHandler) ObtenerProductoPorID(c *gin.Context) {
 	id := c.Param("id")
 
-	resultado := handler.productoService.ObtenerProductoPorID(id)
+	resultado, err := handler.productoService.ObtenerProductoPorID(id)
 
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
 	c.JSON(http.StatusOK, resultado)
 }

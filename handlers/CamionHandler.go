@@ -28,13 +28,21 @@ func (ch *CamionHandler) CrearCamion(c *gin.Context) {
 		return
 	}
 
-	resultado := ch.camionService.CrearCamion(&camion)
+	err := ch.camionService.CrearCamion(&camion)
 
-	c.JSON(http.StatusOK, resultado)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"mensaje": "Camion creado exitosamente"})
 }
 
 func (ch *CamionHandler) ObtenerCamiones(c *gin.Context) {
-	camiones := ch.camionService.ObtenerCamiones()
+	camiones, err := ch.camionService.ObtenerCamiones()
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
 
 	c.JSON(http.StatusOK, camiones)
 }
@@ -42,7 +50,11 @@ func (ch *CamionHandler) ObtenerCamiones(c *gin.Context) {
 func (ch *CamionHandler) ObtenerCamionPorID(c *gin.Context) {
 	id := c.Param("id")
 
-	camion := ch.camionService.ObtenerCamionPorID(id)
+	camion, err := ch.camionService.ObtenerCamionPorID(id)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
 
 	c.JSON(http.StatusOK, camion)
 }
@@ -56,15 +68,23 @@ func (ch *CamionHandler) ActualizarCamion(c *gin.Context) {
 		return
 	}
 
-	resultado := ch.camionService.ActualizarCamion(id, &camion)
+	err := ch.camionService.ActualizarCamion(id, &camion)
 
-	c.JSON(http.StatusOK, resultado)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
+
+	c.JSON(http.StatusOK, gin.H{"mensaje": "Camion actualizado exitosamente"})
 }
 
 func (ch *CamionHandler) EliminarCamion(c *gin.Context) {
 	id := c.Param("id")
 
-	resultado := ch.camionService.EliminarCamion(id)
+	err := ch.camionService.EliminarCamion(id)
 
-	c.JSON(http.StatusOK, resultado)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
+
+	c.JSON(http.StatusOK, gin.H{"mensaje": "Camion eliminado exitosamente"})
 }

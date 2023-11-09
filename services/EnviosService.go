@@ -1,6 +1,8 @@
 package services
 
 import (
+	"errors"
+
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/dto"
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/model"
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/repositories"
@@ -9,11 +11,11 @@ import (
 
 type EnviosInterface interface {
 	//metodos
-	CrearEnvio(envio *dto.Envio) bool
-	IniciarViajeEnvio(id string) bool
-	GenerarParadaEnvio(id string, parada dto.Parada) bool
-	FinalizarViajeEnvio(id string, paradaDestino dto.Parada) bool
-	ObtenerEnvio() []*dto.Envio
+	CrearEnvio(envio *dto.Envio) error
+	IniciarViajeEnvio(id string) error
+	GenerarParadaEnvio(id string, parada dto.Parada) error
+	FinalizarViajeEnvio(id string, paradaDestino dto.Parada) error
+	ObtenerEnvio() ([]*dto.Envio, error)
 }
 
 type EnviosService struct {
@@ -38,7 +40,7 @@ func NewEnviosService(enviosRepository repositories.EnviosRepositoryInterface, p
 //Se genere un envio
 //Envio pasa a estado "A despachar".
 
-func (enviosService *EnviosService) CrearEnvio(envio *dto.Envio) bool {
+func (enviosService *EnviosService) CrearEnvio(envio *dto.Envio) error {
 	camion, _ := enviosService.camionRepository.ObtenerCamionPorID(envio.IDCamion)
 	pesoMaximo := camion.PesoMaximo
 
@@ -58,7 +60,7 @@ func (enviosService *EnviosService) CrearEnvio(envio *dto.Envio) bool {
 	}
 
 	if pesoTotalPedidos > pesoMaximo {
-		return false
+		return errors.New("El peso total de los pedidos supera el peso maximo del camion")
 	}
 
 	//Pasar a estado "Para enviar"
@@ -66,13 +68,13 @@ func (enviosService *EnviosService) CrearEnvio(envio *dto.Envio) bool {
 		enviosService.pedidosRepository.ActualizarPedidoParaEnviar(pedido.ID.Hex())
 	}
 
-	enviosService.enviosRepository.CrearEnvio(envio.GetModel())
+	_, err := enviosService.enviosRepository.CrearEnvio(envio.GetModel())
 
-	return true
+	return err
 }
 
-func (enviosService *EnviosService) ObtenerEnvio() []*dto.Envio {
-	enviosDB, _ := enviosService.enviosRepository.ObtenerEnvio()
+func (enviosService *EnviosService) ObtenerEnvio() ([]*dto.Envio, error) {
+	enviosDB, err := enviosService.enviosRepository.ObtenerEnvio()
 
 	var envios []*dto.Envio
 	for _, envioDB := range enviosDB {
@@ -80,40 +82,34 @@ func (enviosService *EnviosService) ObtenerEnvio() []*dto.Envio {
 		envios = append(envios, envio)
 	}
 
-	return envios
+	return envios, err
 }
 
-func (enviosService *EnviosService) IniciarViajeEnvio(id string) bool {
-	enviosService.enviosRepository.IniciarViajeEnvio(id)
-	return true
+func (enviosService *EnviosService) IniciarViajeEnvio(id string) error {
+	_, err := enviosService.enviosRepository.IniciarViajeEnvio(id)
+	return err
 }
 
-func (enviosService *EnviosService) GenerarParadaEnvio(id string, parada dto.Parada) bool {
-	envio, _ := enviosService.enviosRepository.ObtenerEnvioPorID(id)
-	if envio.Estado == "En ruta" {
-		enviosService.enviosRepository.GenerarParadaEnvio(id, parada.GetModel())
-		return true
+func (enviosService *EnviosService) GenerarParadaEnvio(id string, parada dto.Parada) error {
+	_, err := enviosService.enviosRepository.GenerarParadaEnvio(id, parada.GetModel())
+
+	return err
+}
+
+func (enviosService *EnviosService) FinalizarViajeEnvio(id string, paradaDestino dto.Parada) error {
+	_, err := enviosService.enviosRepository.FinalizarViajeEnvio(id)
+	if err != nil {
+		return err
 	}
-
-	return false
-}
-
-func (enviosService *EnviosService) FinalizarViajeEnvio(id string, paradaDestino dto.Parada) bool {
 	envio, _ := enviosService.enviosRepository.ObtenerEnvioPorID(id)
-	if envio.Estado == "En ruta" {
-		enviosService.enviosRepository.GenerarParadaEnvio(id, paradaDestino.GetModel())
-		enviosService.enviosRepository.FinalizarViajeEnvio(id)
-		for _, pedido := range envio.Pedidos {
-			enviosService.pedidosRepository.ActualizarPedidoEnviado(pedido)
-			pedido, _ := enviosService.pedidosRepository.ObtenerPedidoPorID(pedido)
-			for _, producto := range pedido.ListaProductos {
-				var idProducto = utils.GetStringIDFromObjectID(producto.IDProducto)
-				enviosService.productoRepository.DescontarStock(idProducto, producto.Cantidad)
-			}
-
+	enviosService.enviosRepository.GenerarParadaEnvio(id, paradaDestino.GetModel())
+	for _, pedido := range envio.Pedidos {
+		enviosService.pedidosRepository.ActualizarPedidoEnviado(pedido)
+		pedido, _ := enviosService.pedidosRepository.ObtenerPedidoPorID(pedido)
+		for _, producto := range pedido.ListaProductos {
+			var idProducto = utils.GetStringIDFromObjectID(producto.IDProducto)
+			enviosService.productoRepository.DescontarStock(idProducto, producto.Cantidad)
 		}
-		return true
 	}
-
-	return false
+	return nil
 }

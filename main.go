@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 
-	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/clients"
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/handlers"
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/middlewares"
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/repositories"
@@ -32,12 +31,12 @@ func main() {
 
 func mappingRoutes() {
 
-	var authClient clients.AuthClientInterface
-	authClient = clients.NewAuthClient()
-	authMiddleware := middlewares.NewAuthMiddleware(authClient)
+	// var authClient clients.AuthClientInterface
+	// authClient = clients.NewAuthClient()
+	// authMiddleware := middlewares.NewAuthMiddleware(authClient)
 
-	//Uso del middleware para todas las rutas del grupo
-	router.Use(authMiddleware.ValidateToken)
+	// //Uso del middleware para todas las rutas del grupo
+	// router.Use(authMiddleware.ValidateToken)
 
 	router.Use(middlewares.CORSMiddleware())
 	//Productos CRUD

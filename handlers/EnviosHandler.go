@@ -31,13 +31,22 @@ func (enviosHandler *EnviosHandler) CrearEnvio(c *gin.Context) {
 		return
 	}
 
-	resultado := enviosHandler.enviosService.CrearEnvio(&envio)
+	err := enviosHandler.enviosService.CrearEnvio(&envio)
 
-	c.JSON(http.StatusOK, resultado)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
+
+	c.JSON(http.StatusOK, gin.H{"mensaje": "Envio creado exitosamente"})
+
 }
 
 func (enviosHandler *EnviosHandler) ObtenerEnvio(c *gin.Context) {
-	envios := enviosHandler.enviosService.ObtenerEnvio()
+	envios, err := enviosHandler.enviosService.ObtenerEnvio()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
+
 	c.JSON(http.StatusOK, envios)
 }
 
@@ -46,9 +55,13 @@ func (enviosHandler *EnviosHandler) IniciarViajeEnvio(c *gin.Context) {
 
 	//verificar que no sea nulo
 
-	resultado := enviosHandler.enviosService.IniciarViajeEnvio(id)
+	err := enviosHandler.enviosService.IniciarViajeEnvio(id)
 
-	c.JSON(http.StatusOK, resultado)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
+
+	c.JSON(http.StatusOK, gin.H{"mensaje": "Envio iniciado en viaje exitosamente"})
 }
 
 func (enviosHandler *EnviosHandler) GenerarParadaEnvio(c *gin.Context) {
@@ -61,9 +74,13 @@ func (enviosHandler *EnviosHandler) GenerarParadaEnvio(c *gin.Context) {
 		return
 	}
 
-	resultado := enviosHandler.enviosService.GenerarParadaEnvio(id, parada)
+	err := enviosHandler.enviosService.GenerarParadaEnvio(id, parada)
 
-	c.JSON(http.StatusOK, resultado)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
+
+	c.JSON(http.StatusOK, gin.H{"mensaje": "Parada exitosamente agregada al envio"})
 }
 
 func (EnviosHandler *EnviosHandler) FinalizarViajeEnvio(c *gin.Context) {
@@ -75,7 +92,11 @@ func (EnviosHandler *EnviosHandler) FinalizarViajeEnvio(c *gin.Context) {
 		return
 	}
 
-	resultado := EnviosHandler.enviosService.FinalizarViajeEnvio(id, paradaDestino)
+	err := EnviosHandler.enviosService.FinalizarViajeEnvio(id, paradaDestino)
 
-	c.JSON(http.StatusOK, resultado)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
+
+	c.JSON(http.StatusOK, gin.H{"mensaje": "Parada exitosamente agregada al envio y finalizada"})
 }

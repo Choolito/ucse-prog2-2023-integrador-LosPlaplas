@@ -7,13 +7,13 @@ import (
 
 type ProductoInterface interface {
 	//metodos
-	CrearProducto(producto *dto.Producto) bool
-	ObtenerProductos() []*dto.Producto
-	ActualizarProducto(id string, producto *dto.Producto) bool
-	EliminarProducto(id string) bool
-	ObtenerListaConStockMinimo() []*dto.Producto
-	ObtenerListaFiltrada(filtro string) []*dto.Producto
-	ObtenerProductoPorID(id string) *dto.Producto
+	CrearProducto(producto *dto.Producto) error
+	ObtenerProductos() ([]*dto.Producto, error)
+	ActualizarProducto(id string, producto *dto.Producto) error
+	EliminarProducto(id string) error
+	ObtenerListaConStockMinimo() ([]*dto.Producto, error)
+	ObtenerListaFiltrada(filtro string) ([]*dto.Producto, error)
+	ObtenerProductoPorID(id string) (*dto.Producto, error)
 }
 
 type ProductoService struct {
@@ -26,14 +26,13 @@ func NewProductoService(productoRepository repositories.ProductoRepositoryInterf
 
 //CRUD de producto
 
-func (ps *ProductoService) CrearProducto(producto *dto.Producto) bool {
-	ps.productoRepository.CrearProducto(producto.GetModel())
-
-	return true
+func (ps *ProductoService) CrearProducto(producto *dto.Producto) error {
+	_, err := ps.productoRepository.CrearProducto(producto.GetModel())
+	return err
 }
 
-func (ps *ProductoService) ObtenerProductos() []*dto.Producto {
-	productosDB, _ := ps.productoRepository.ObtenerProductos()
+func (ps *ProductoService) ObtenerProductos() ([]*dto.Producto, error) {
+	productosDB, err := ps.productoRepository.ObtenerProductos()
 
 	var productos []*dto.Producto
 	for _, productoDB := range productosDB {
@@ -41,21 +40,21 @@ func (ps *ProductoService) ObtenerProductos() []*dto.Producto {
 		productos = append(productos, producto)
 	}
 
-	return productos
+	return productos, err
 }
 
-func (ps *ProductoService) ActualizarProducto(id string, producto *dto.Producto) bool {
-	ps.productoRepository.ActualizarProducto(id, producto.GetModel())
-	return true
+func (ps *ProductoService) ActualizarProducto(id string, producto *dto.Producto) error {
+	_, err := ps.productoRepository.ActualizarProducto(id, producto.GetModel())
+	return err
 }
 
-func (ps *ProductoService) EliminarProducto(id string) bool {
-	ps.productoRepository.EliminarProducto(id)
-	return true
+func (ps *ProductoService) EliminarProducto(id string) error {
+	_, err := ps.productoRepository.EliminarProducto(id)
+	return err
 }
 
-func (ps *ProductoService) ObtenerListaConStockMinimo() []*dto.Producto {
-	productosDB, _ := ps.productoRepository.ObtenerProductos()
+func (ps *ProductoService) ObtenerListaConStockMinimo() ([]*dto.Producto, error) {
+	productosDB, err := ps.productoRepository.ObtenerProductos()
 
 	var productos []*dto.Producto
 	for _, productoDB := range productosDB {
@@ -65,11 +64,11 @@ func (ps *ProductoService) ObtenerListaConStockMinimo() []*dto.Producto {
 		}
 	}
 
-	return productos
+	return productos, err
 }
 
-func (ps *ProductoService) ObtenerListaFiltrada(filtro string) []*dto.Producto {
-	productosDB, _ := ps.productoRepository.ObtenerListaFiltrada(filtro)
+func (ps *ProductoService) ObtenerListaFiltrada(filtro string) ([]*dto.Producto, error) {
+	productosDB, err := ps.productoRepository.ObtenerListaFiltrada(filtro)
 
 	var productos []*dto.Producto
 	for _, productoDB := range productosDB {
@@ -77,13 +76,13 @@ func (ps *ProductoService) ObtenerListaFiltrada(filtro string) []*dto.Producto {
 		productos = append(productos, producto)
 	}
 
-	return productos
+	return productos, err
 }
 
-func (ps *ProductoService) ObtenerProductoPorID(id string) *dto.Producto {
-	productoDB, _ := ps.productoRepository.ObtenerProductoPorID(id)
+func (ps *ProductoService) ObtenerProductoPorID(id string) (*dto.Producto, error) {
+	productoDB, err := ps.productoRepository.ObtenerProductoPorID(id)
 
 	producto := dto.NewProducto(*productoDB)
 
-	return producto
+	return producto, err
 }

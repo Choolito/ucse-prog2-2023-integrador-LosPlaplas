@@ -7,11 +7,11 @@ import (
 
 type CamionInterface interface {
 	//metodos
-	CrearCamion(camion *dto.Camion) bool
-	ObtenerCamiones() []*dto.Camion
-	ActualizarCamion(id string, camion *dto.Camion) bool
-	EliminarCamion(id string) bool
-	ObtenerCamionPorID(id string) *dto.Camion
+	CrearCamion(camion *dto.Camion) error
+	ObtenerCamiones() ([]*dto.Camion, error)
+	ActualizarCamion(id string, camion *dto.Camion) error
+	EliminarCamion(id string) error
+	ObtenerCamionPorID(id string) (*dto.Camion, error)
 }
 
 type CamionService struct {
@@ -28,14 +28,14 @@ func NewCamionService(camionRepository repositories.CamionRepositoryInterface) *
 
 //PesoMaximo() --> devuelve el peso maximo del camion
 
-func (cs *CamionService) CrearCamion(camion *dto.Camion) bool {
-	cs.camionRepository.CrearCamion(camion.GetModel())
+func (cs *CamionService) CrearCamion(camion *dto.Camion) error {
+	_, err := cs.camionRepository.CrearCamion(camion.GetModel())
 
-	return true
+	return err
 }
 
-func (cs *CamionService) ObtenerCamiones() []*dto.Camion {
-	camionesDB, _ := cs.camionRepository.ObtenerCamiones()
+func (cs *CamionService) ObtenerCamiones() ([]*dto.Camion, error) {
+	camionesDB, err := cs.camionRepository.ObtenerCamiones()
 
 	var camiones []*dto.Camion
 	for _, camionDB := range camionesDB {
@@ -43,25 +43,25 @@ func (cs *CamionService) ObtenerCamiones() []*dto.Camion {
 		camiones = append(camiones, camion)
 	}
 
-	return camiones
+	return camiones, err
 }
 
-func (cs *CamionService) ObtenerCamionPorID(id string) *dto.Camion {
-	camionDB, _ := cs.camionRepository.ObtenerCamionPorID(id)
+func (cs *CamionService) ObtenerCamionPorID(id string) (*dto.Camion, error) {
+	camionDB, err := cs.camionRepository.ObtenerCamionPorID(id)
 
 	camion := dto.NewCamion(*camionDB)
 
-	return camion
+	return camion, err
 }
 
-func (cs *CamionService) ActualizarCamion(id string, camion *dto.Camion) bool {
-	cs.camionRepository.ActualizarCamion(id, camion.GetModel())
+func (cs *CamionService) ActualizarCamion(id string, camion *dto.Camion) error {
+	_, err := cs.camionRepository.ActualizarCamion(id, camion.GetModel())
 
-	return true
+	return err
 }
 
-func (cs *CamionService) EliminarCamion(id string) bool {
-	cs.camionRepository.EliminarCamion(id)
+func (cs *CamionService) EliminarCamion(id string) error {
+	_, err := cs.camionRepository.EliminarCamion(id)
 
-	return true
+	return err
 }

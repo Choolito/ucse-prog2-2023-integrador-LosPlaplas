@@ -3,6 +3,8 @@ package repositories
 import (
 	"time"
 
+	"errors"
+
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/model"
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -79,7 +81,14 @@ func (enviosRepository *EnviosRepository) GenerarParadaEnvio(id string, parada m
 	objectID := utils.GetObjectIDFromStringID(id)
 	filter := bson.M{"_id": objectID}
 
-	envio, _ := enviosRepository.ObtenerEnvioPorID(id)
+	envio, err := enviosRepository.ObtenerEnvioPorID(id)
+	if err != nil {
+		return nil, err // Manejo del error si no se puede obtener el envío.
+	}
+
+	if envio.Estado != "En ruta" {
+		return nil, errors.New("el envío no está en estado 'En ruta', no se puede generar una parada")
+	}
 
 	paradas := envio.Paradas
 	paradas = append(paradas, parada)
@@ -100,10 +109,28 @@ func (enviosRepository *EnviosRepository) ObtenerEnvioPorID(id string) (model.En
 	return envio, err
 }
 
-func (EnviosRepository *EnviosRepository) FinalizarViajeEnvio(id string) (*mongo.UpdateResult, error) {
-	collection := EnviosRepository.db.GetClient().Database("LosPlaplas").Collection("envios")
+func (enviosRepository *EnviosRepository) FinalizarViajeEnvio(id string) (*mongo.UpdateResult, error) {
+	// collection := EnviosRepository.db.GetClient().Database("LosPlaplas").Collection("envios")
+	// objectID := utils.GetObjectIDFromStringID(id)
+	// filter := bson.M{"_id": objectID, "estado": "En ruta"}
+	// update := bson.M{"$set": bson.M{"estado": "Despachado", "fechaActualizacion": time.Now()}}
+	// resultado, err := collection.UpdateOne(context.Background(), filter, update)
+	// return resultado, err
+
+	collection := enviosRepository.db.GetClient().Database("LosPlaplas").Collection("envios")
 	objectID := utils.GetObjectIDFromStringID(id)
 	filter := bson.M{"_id": objectID, "estado": "En ruta"}
+
+	// Verificar si el envío está en estado "En ruta" antes de finalizarlo.
+	count, err := collection.CountDocuments(context.Background(), filter)
+	if err != nil {
+		return nil, err // Manejo del error si hay un problema en la consulta.
+	}
+
+	if count == 0 {
+		return nil, errors.New("El envío no está en estado 'En ruta', no se puede finalizar") // Retorna un error si el estado no es el adecuado.
+	}
+
 	update := bson.M{"$set": bson.M{"estado": "Despachado", "fechaActualizacion": time.Now()}}
 	resultado, err := collection.UpdateOne(context.Background(), filter, update)
 	return resultado, err

@@ -31,13 +31,21 @@ func (ph *PedidosHandler) CrearPedido(c *gin.Context) {
 		return
 	}
 
-	resultado := ph.pedidosService.CrearPedido(&pedido)
+	err := ph.pedidosService.CrearPedido(&pedido)
 
-	c.JSON(http.StatusOK, resultado)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"mensaje": "Pedido creado exitosamente"})
 }
 
 func (ph *PedidosHandler) ObtenerPedidos(c *gin.Context) {
-	pedidos := ph.pedidosService.ObtenerPedidos()
+	pedidos, err := ph.pedidosService.ObtenerPedidos()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
+
 	c.JSON(http.StatusOK, pedidos)
 }
 
@@ -50,28 +58,44 @@ func (ph *PedidosHandler) ActualizarPedido(c *gin.Context) {
 		return
 	}
 
-	resultado := ph.pedidosService.ActualizarPedido(id, &pedido)
+	err := ph.pedidosService.ActualizarPedido(id, &pedido)
 
-	c.JSON(http.StatusOK, resultado)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
+
+	c.JSON(http.StatusOK, gin.H{"mensaje": "Pedido actualizado exitosamente"})
 }
 
 // Este delete es un put
 func (ph *PedidosHandler) EliminarPedido(c *gin.Context) {
 	id := c.Param("id")
 
-	resultado := ph.pedidosService.EliminarPedido(id)
+	err := ph.pedidosService.EliminarPedido(id)
 
-	c.JSON(http.StatusOK, resultado)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
+
+	c.JSON(http.StatusOK, gin.H{"mensaje": "Pedido eliminado exitosamente"})
 }
 
 func (ph *PedidosHandler) ObtenerPedidosPendientes(c *gin.Context) {
-	pedidos := ph.pedidosService.ObtenerPedidosPendientes()
+	pedidos, err := ph.pedidosService.ObtenerPedidosPendientes()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
+
 	c.JSON(http.StatusOK, pedidos)
 }
 func (ph *PedidosHandler) ActualizarPedidoAceptado(c *gin.Context) {
 	id := c.Param("id")
 
-	resultado := ph.pedidosService.ActualizarPedidoAceptado(id)
+	err := ph.pedidosService.ActualizarPedidoAceptado(id)
 
-	c.JSON(http.StatusOK, resultado)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
+
+	c.JSON(http.StatusOK, gin.H{"mensaje": "Pedido actualizado a aceptado exitosamente"})
 }
