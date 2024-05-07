@@ -12,7 +12,7 @@ type Envio struct {
 	IDCamion           string
 	Pedidos            []string
 	Paradas            []Parada
-	Estado             string
+	Estado             model.EstadoEnvio
 	FechaCreacion      time.Time
 	FechaActualizacion time.Time
 }
@@ -22,7 +22,7 @@ func NewEnvio(envio model.Envio) *Envio {
 		ID:                 utils.GetStringIDFromObjectID(envio.ID),
 		IDCamion:           utils.GetStringIDFromObjectID(envio.IDCamion),
 		Pedidos:            envio.Pedidos,
-		Paradas:            listaParadasDTO(envio.Paradas),
+		Paradas:            newParadas(envio.Paradas),
 		Estado:             envio.Estado,
 		FechaCreacion:      envio.FechaCreacion,
 		FechaActualizacion: envio.FechaActualizacion,
@@ -38,7 +38,7 @@ func NewEnvio(envio model.Envio) *Envio {
 		return listaSaliente
 	}
 */
-func listaParadasDTO(listaIngresante []model.Parada) []Parada {
+func newParadas(listaIngresante []model.Parada) []Parada {
 	var listaSaliente []Parada
 	for _, parada := range listaIngresante {
 		listaSaliente = append(listaSaliente, *NewParada(parada))
@@ -51,7 +51,7 @@ func (envio Envio) GetModel() model.Envio {
 		ID:                 utils.GetObjectIDFromStringID(envio.ID),
 		IDCamion:           utils.GetObjectIDFromStringID(envio.IDCamion),
 		Pedidos:            envio.Pedidos,
-		Paradas:            listaParadasModel(envio.Paradas),
+		Paradas:            envio.getParadas(),
 		Estado:             envio.Estado,
 		FechaCreacion:      envio.FechaCreacion,
 		FechaActualizacion: envio.FechaActualizacion,
@@ -67,9 +67,9 @@ func (envio Envio) GetModel() model.Envio {
 		return listaSaliente
 	}
 */
-func listaParadasModel(listaIngresante []Parada) []model.Parada {
+func (envio Envio) getParadas() []model.Parada {
 	var listaSaliente []model.Parada
-	for _, parada := range listaIngresante {
+	for _, parada := range envio.Paradas {
 		listaSaliente = append(listaSaliente, parada.GetModel())
 	}
 	return listaSaliente

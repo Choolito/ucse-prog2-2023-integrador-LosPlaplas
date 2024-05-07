@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/dto"
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/model"
@@ -16,6 +17,7 @@ type EnviosInterface interface {
 	GenerarParadaEnvio(id string, parada dto.Parada) error
 	FinalizarViajeEnvio(id string, paradaDestino dto.Parada) error
 	ObtenerEnvio() ([]*dto.Envio, error)
+	CambiarEstadoEnvio(envio *dto.Envio, user *dto.User) (bool, error)
 }
 
 type EnviosService struct {
@@ -68,7 +70,7 @@ func (enviosService *EnviosService) CrearEnvio(envio *dto.Envio) error {
 		enviosService.pedidosRepository.ActualizarPedidoParaEnviar(pedido.ID.Hex())
 	}
 
-	_, err := enviosService.enviosRepository.CrearEnvio(envio.GetModel())
+	err := enviosService.enviosRepository.CrearEnvio(envio.GetModel())
 
 	return err
 }
@@ -112,4 +114,84 @@ func (enviosService *EnviosService) FinalizarViajeEnvio(id string, paradaDestino
 		}
 	}
 	return nil
+}
+
+func (enviosService *EnviosService) CambiarEstadoEnvio(envio *dto.Envio, user *dto.User) (bool, error) {
+	nuevoEstado := envio.Estado
+
+	if !model.EsUnEstadoEnvioValido(nuevoEstado) {
+		return false, errors.New("El estado del envío no es válido")
+	}
+
+	envioDB, err := enviosService.enviosRepository.ObtenerEnvioPorID(envio.ID)
+
+	if err != nil {
+		return false, err
+	}
+
+	//rol validar
+
+	if (nuevoEstado == model.EnRuta && envioDB.Estado != model.ADespachar) || (nuevoEstado == model.Despachado && envioDB.Estado != model.EnRuta) {
+		return false, errors.New("El envio no puede pasar del estado " + fmt.Sprint(nuevoEstado) + " si se encuentra en el estado " + fmt.Sprint(envioDB.Estado))
+	}
+
+	envioDB.Estado = nuevoEstado
+	err = enviosService.enviosRepository.ActualizarEnvio(&envioDB)
+
+	if err != nil {
+		return false, err
+	}
+
+	if nuevoEstado == model.Despachado {
+		enviosService.finalizarViaje(dto.NewEnvio(envioDB))
+	}
+
+	return true, nil
+
+}
+
+func (enviosService *EnviosService) finalizarViaje(envio *dto.Envio) (bool, error) {
+	//pasar pedidos a estado enviado
+	err := enviosService.entregarPedidosDeEnvio(envio)
+
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+func (enviosService *EnviosService) entregarPedidosDeEnvio(envio *dto.Envio) error {
+	for _, idPedido := range envio.Pedidos {
+
+		//Descuenta el stock de los productos
+		err := enviosService.entregarPedido(&dto.Pedidos{ID: idPedido})
+
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (enviosService *EnviosService) entregarPedido(pedidoPorEntregar *dto.Pedidos) error {
+	//Primero buscamos el pedido a entregar
+	pedido, err := enviosService.pedidosRepository.ObtenerPedidoPorID(pedidoPorEntregar.ID)
+
+	if err != nil {
+		return err
+	}
+
+	//Valida que el pedido esté en estado Para enviar
+	if pedido.EstadoPedido != model.ParaEnviar {
+		return nil
+	}
+
+	//Cambia el estado del pedido a Enviado, si es que no estaba ya en ese estado
+	if pedido.EstadoPedido != model.Enviado {
+		pedido.EstadoPedido = model.Enviado
+	}
+
+	//Actualiza el pedido en la base de datos
+	return enviosService.pedidosRepository.ActualizarPedido(*pedido)
 }

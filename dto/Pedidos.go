@@ -11,7 +11,7 @@ type Pedidos struct {
 	ID                  string
 	ListaProductos      []ProductoCantidad
 	CiudadDestinoPedido string
-	EstadoPedido        string
+	EstadoPedido        model.EstadoPedido
 	FechaCreacion       time.Time
 	FechaActualizacion  time.Time
 }
@@ -19,7 +19,7 @@ type Pedidos struct {
 func NewPedidos(pedidos model.Pedidos) *Pedidos {
 	return &Pedidos{
 		ID:                  utils.GetStringIDFromObjectID(pedidos.ID),
-		ListaProductos:      listaProductoCantidadDTO(pedidos.ListaProductos),
+		ListaProductos:      newProductoCantidad(pedidos.ListaProductos),
 		CiudadDestinoPedido: pedidos.CiudadDestinoPedido,
 		EstadoPedido:        pedidos.EstadoPedido,
 		FechaCreacion:       pedidos.FechaCreacion,
@@ -27,7 +27,7 @@ func NewPedidos(pedidos model.Pedidos) *Pedidos {
 	}
 }
 
-func listaProductoCantidadDTO(listaIngresante []model.ProductoCantidad) []ProductoCantidad {
+func newProductoCantidad(listaIngresante []model.ProductoCantidad) []ProductoCantidad {
 	var listaSaliente []ProductoCantidad
 	for _, producto := range listaIngresante {
 		listaSaliente = append(listaSaliente, *NewProductoCantidad(producto))
@@ -38,14 +38,14 @@ func listaProductoCantidadDTO(listaIngresante []model.ProductoCantidad) []Produc
 func (pedidos Pedidos) GetModel() model.Pedidos {
 	return model.Pedidos{
 		ID:                  utils.GetObjectIDFromStringID(pedidos.ID),
-		ListaProductos:      listaProductoCantidadModel(pedidos.ListaProductos),
+		ListaProductos:      getProductoCantidad(pedidos.ListaProductos),
 		CiudadDestinoPedido: pedidos.CiudadDestinoPedido,
 		EstadoPedido:        pedidos.EstadoPedido,
 		FechaCreacion:       pedidos.FechaCreacion,
 		FechaActualizacion:  pedidos.FechaActualizacion,
 	}
 }
-func listaProductoCantidadModel(listaIngresante []ProductoCantidad) []model.ProductoCantidad {
+func getProductoCantidad(listaIngresante []ProductoCantidad) []model.ProductoCantidad {
 	var listaSaliente []model.ProductoCantidad
 	for _, producto := range listaIngresante {
 		listaSaliente = append(listaSaliente, producto.GetModel())

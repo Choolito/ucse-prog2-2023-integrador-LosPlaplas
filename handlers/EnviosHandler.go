@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/services"
+	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/utils"
 	"github.com/gin-gonic/gin"
 
 	"net/http"
@@ -99,4 +100,28 @@ func (EnviosHandler *EnviosHandler) FinalizarViajeEnvio(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"mensaje": "Parada exitosamente agregada al envio y finalizada"})
+}
+
+func (enviosHandler *EnviosHandler) CambiarEstadoEnvio(c *gin.Context) {
+	user := dto.NewUser(utils.GetUserInfoFromContext(c))
+
+	var envio dto.Envio
+
+	err := c.ShouldBindJSON(&envio)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	operacion, err := enviosHandler.enviosService.CambiarEstadoEnvio(&envio, &user)
+	if err != nil || !operacion {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		//faltaria trabajar con logging
+		//logging.LoggearErrorYResponder(c, "nombre del handler", "Que metodo", err, &user(User no lo tengo aplicado))
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"mensaje": "Envio creado exitosamente"})
+	//logging.LoggearResultadoYResponder(c, "nombre del handler", "Que metodo", true, &user) Lo mismo aca abajo
+
 }

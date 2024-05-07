@@ -21,6 +21,8 @@ func NewCamionHandler(camionService services.CamionInterface) *CamionHandler {
 //CRUD de Camion
 
 func (ch *CamionHandler) CrearCamion(c *gin.Context) {
+	//user
+
 	var camion dto.Camion
 
 	if err := c.ShouldBindJSON(&camion); err != nil {
@@ -38,6 +40,8 @@ func (ch *CamionHandler) CrearCamion(c *gin.Context) {
 }
 
 func (ch *CamionHandler) ObtenerCamiones(c *gin.Context) {
+	//user
+
 	camiones, err := ch.camionService.ObtenerCamiones()
 
 	if err != nil {

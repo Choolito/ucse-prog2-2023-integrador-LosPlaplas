@@ -9,7 +9,6 @@ type PedidosInterface interface {
 	//metodos
 	CrearPedido(pedido *dto.Pedidos) error
 	ObtenerPedidos() ([]*dto.Pedidos, error)
-	ActualizarPedido(id string, pedido *dto.Pedidos) error
 	EliminarPedido(id string) error
 	ObtenerPedidosPendientes() ([]*dto.Pedidos, error)
 	ActualizarPedidoAceptado(id string) error
@@ -39,7 +38,6 @@ func (ps *PedidosService) CrearPedido(pedido *dto.Pedidos) error {
 		var ProductoCantidad dto.ProductoCantidad
 		ProductoCantidad.IDProducto = producto.IDProducto
 		ProductoCantidad.CodigoProducto = productoBuscado.CodigoProducto
-		ProductoCantidad.TipoProducto = productoBuscado.TipoProducto
 		ProductoCantidad.Nombre = productoBuscado.Nombre
 		ProductoCantidad.Cantidad = producto.Cantidad
 		ProductoCantidad.PrecioUnitario = productoBuscado.PrecioUnitario
@@ -61,12 +59,6 @@ func (ps *PedidosService) ObtenerPedidos() ([]*dto.Pedidos, error) {
 	}
 
 	return pedidos, err
-}
-
-func (ps *PedidosService) ActualizarPedido(id string, pedido *dto.Pedidos) error {
-	_, err := ps.pedidosRepository.ActualizarPedido(id, pedido.GetModel())
-
-	return err
 }
 
 func (ps *PedidosService) EliminarPedido(id string) error {

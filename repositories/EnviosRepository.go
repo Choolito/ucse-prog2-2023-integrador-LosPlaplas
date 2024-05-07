@@ -15,12 +15,16 @@ import (
 
 type EnviosRepositoryInterface interface {
 	//metodos
-	CrearEnvio(envio model.Envio) (*mongo.InsertOneResult, error)
+	CrearEnvio(envio model.Envio) error
+
+	ObtenerEnvio() ([]*model.Envio, error)
+	ObtenerEnvioPorID(id string) (model.Envio, error)
+
+	ActualizarEnvio(envio *model.Envio) error
+
 	IniciarViajeEnvio(id string) (*mongo.UpdateResult, error)
 	GenerarParadaEnvio(id string, parada model.Parada) (*mongo.UpdateResult, error)
-	ObtenerEnvioPorID(id string) (model.Envio, error)
 	FinalizarViajeEnvio(id string) (*mongo.UpdateResult, error)
-	ObtenerEnvio() ([]*model.Envio, error)
 }
 
 type EnviosRepository struct {
@@ -36,14 +40,14 @@ func NewEnviosRepository(db DB) *EnviosRepository {
 // metodos
 // Generar envio
 // Cambiar a createShipping
-func (enviosRepository *EnviosRepository) CrearEnvio(envio model.Envio) (*mongo.InsertOneResult, error) {
+func (enviosRepository *EnviosRepository) CrearEnvio(envio model.Envio) error {
 	collecction := enviosRepository.db.GetClient().Database("LosPlaplas").Collection("envios")
 	envio.FechaCreacion = time.Now()
 	envio.FechaActualizacion = time.Now()
 	envio.Estado = "A despachar"
-	resultado, err := collecction.InsertOne(context.TODO(), envio)
+	_, err := collecction.InsertOne(context.TODO(), envio)
 
-	return resultado, err
+	return err
 }
 
 func (enviosRepository *EnviosRepository) ObtenerEnvio() ([]*model.Envio, error) {
@@ -134,4 +138,24 @@ func (enviosRepository *EnviosRepository) FinalizarViajeEnvio(id string) (*mongo
 	update := bson.M{"$set": bson.M{"estado": "Despachado", "fechaActualizacion": time.Now()}}
 	resultado, err := collection.UpdateOne(context.Background(), filter, update)
 	return resultado, err
+}
+
+func (EnviosRepository *EnviosRepository) ActualizarEnvio(envio model.Envio) error {
+	collection := EnviosRepository.db.GetClient().Database("LosPlaplas").Collection("envios")
+	filter := bson.M{"_id": envio.ID}
+
+	update := bson.M{"$set": bson.M{
+		"estado":             envio.Estado,
+		"fechaActualizacion": time.Now(),
+		"paradas":            envio.Paradas,
+		"pedidos":            envio.Pedidos,
+		"camionero":          envio.IDCamion,
+	}}
+	operacion, err := collection.UpdateOne(context.Background(), filter, update)
+
+	if operacion.MatchedCount == 0 {
+		return errors.New("No se encontró el envío")
+	}
+
+	return err
 }

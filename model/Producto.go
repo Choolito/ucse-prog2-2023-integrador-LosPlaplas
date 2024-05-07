@@ -9,7 +9,7 @@ import (
 type Producto struct {
 	ID                 primitive.ObjectID `bson:"_id,omitempty"`
 	CodigoProducto     string             `bson:"codigoProducto"`
-	TipoProducto       string             `bson:"tipoProducto"`
+	TipoProducto       TipoProducto       `bson:"tipoProducto"`
 	Nombre             string             `bson:"nombre"`
 	PrecioUnitario     int                `bson:"precioUnitario"`
 	PesoUnitario       int                `bson:"pesoUnitario"`

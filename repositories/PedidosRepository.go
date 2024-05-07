@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/model"
@@ -14,7 +15,7 @@ type PedidosRepositoryInterface interface {
 	//metodos
 	CrearPedido(pedido model.Pedidos) (*mongo.InsertOneResult, error)
 	ObtenerPedidos() ([]*model.Pedidos, error)
-	ActualizarPedido(id string, pedido model.Pedidos) (*mongo.UpdateResult, error)
+	ActualizarPedido(pedido model.Pedidos) error
 	EliminarPedido(id string) (*mongo.UpdateResult, error)
 	ObtenerPedidosPendientes() ([]*model.Pedidos, error)
 	ActualizarPedidoAceptado(id string) (*mongo.UpdateResult, error)
@@ -78,22 +79,25 @@ func (pr *PedidosRepository) ObtenerPedidoPorID(id string) (*model.Pedidos, erro
 	return &pedido, err
 }
 
-func (pr *PedidosRepository) ActualizarPedido(id string, pedido model.Pedidos) (*mongo.UpdateResult, error) {
+// Actualizar general
+func (pr *PedidosRepository) ActualizarPedido(pedido *model.Pedidos) error {
 	collection := pr.db.GetClient().Database("LosPlaplas").Collection("pedidos")
 
-	objectID := utils.GetObjectIDFromStringID(id)
-
-	filtro := bson.M{"_id": objectID}
+	filtro := bson.M{"_id": pedido.ID}
 
 	update := bson.M{
 		"$set": bson.M{
-			"listaProductos":      pedido.ListaProductos,
-			"ciudadDestinoPedido": pedido.CiudadDestinoPedido,
-			"fechaActualizacion":  time.Now(),
+			"estadoPedido":       pedido.EstadoPedido,
+			"fechaActualizacion": time.Now(),
 		},
 	}
 	resultado, err := collection.UpdateOne(context.Background(), filtro, update)
-	return resultado, err
+
+	if resultado.MatchedCount == 0 {
+		return errors.New("no se encontró el pedido a actualizar")
+	}
+
+	return err
 }
 
 func (pr *PedidosRepository) EliminarPedido(id string) (*mongo.UpdateResult, error) {

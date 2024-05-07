@@ -49,24 +49,6 @@ func (ph *PedidosHandler) ObtenerPedidos(c *gin.Context) {
 	c.JSON(http.StatusOK, pedidos)
 }
 
-func (ph *PedidosHandler) ActualizarPedido(c *gin.Context) {
-	id := c.Param("id")
-	var pedido dto.Pedidos
-
-	if err := c.ShouldBindJSON(&pedido); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	err := ph.pedidosService.ActualizarPedido(id, &pedido)
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	}
-
-	c.JSON(http.StatusOK, gin.H{"mensaje": "Pedido actualizado exitosamente"})
-}
-
 // Este delete es un put
 func (ph *PedidosHandler) EliminarPedido(c *gin.Context) {
 	id := c.Param("id")

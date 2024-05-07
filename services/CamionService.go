@@ -29,7 +29,7 @@ func NewCamionService(camionRepository repositories.CamionRepositoryInterface) *
 //PesoMaximo() --> devuelve el peso maximo del camion
 
 func (cs *CamionService) CrearCamion(camion *dto.Camion) error {
-	_, err := cs.camionRepository.CrearCamion(camion.GetModel())
+	err := cs.camionRepository.CrearCamion(camion.GetModel())
 
 	return err
 }
@@ -55,7 +55,7 @@ func (cs *CamionService) ObtenerCamionPorID(id string) (*dto.Camion, error) {
 }
 
 func (cs *CamionService) ActualizarCamion(id string, camion *dto.Camion) error {
-	_, err := cs.camionRepository.ActualizarCamion(id, camion.GetModel())
+	err := cs.camionRepository.ActualizarCamion(id, camion.GetModel())
 
 	return err
 }

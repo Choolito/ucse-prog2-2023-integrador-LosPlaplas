@@ -10,7 +10,7 @@ type Pedidos struct {
 	ID                  primitive.ObjectID `bson:"_id,omitempty"`
 	ListaProductos      []ProductoCantidad `bson:"listaProductos"`
 	CiudadDestinoPedido string             `bson:"ciudadDestinoPedido"`
-	EstadoPedido        string             `bson:"estadoPedido"`
+	EstadoPedido        EstadoPedido       `bson:"estadoPedido"`
 	FechaCreacion       time.Time          `bson:"fechaCreacion"`
 	FechaActualizacion  time.Time          `bson:"fechaActualizacion"`
 }

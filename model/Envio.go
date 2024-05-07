@@ -11,7 +11,7 @@ type Envio struct {
 	IDCamion           primitive.ObjectID `bson:"idCamion,omitempty"`
 	Pedidos            []string           `bson:"pedidos"`
 	Paradas            []Parada           `bson:"paradas"`
-	Estado             string             `bson:"estado"`
+	Estado             EstadoEnvio        `bson:"estado"`
 	FechaCreacion      time.Time          `bson:"fechaCreacion"`
 	FechaActualizacion time.Time          `bson:"fechaActualizacion"`
 }

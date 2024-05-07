@@ -8,7 +8,6 @@ import (
 type ProductoCantidad struct {
 	IDProducto     string
 	CodigoProducto string
-	TipoProducto   string
 	Nombre         string
 	Cantidad       int
 	PrecioUnitario int
@@ -19,7 +18,6 @@ func NewProductoCantidad(productoCantidad model.ProductoCantidad) *ProductoCanti
 	return &ProductoCantidad{
 		IDProducto:     utils.GetStringIDFromObjectID(productoCantidad.IDProducto),
 		CodigoProducto: productoCantidad.CodigoProducto,
-		TipoProducto:   productoCantidad.TipoProducto,
 		Nombre:         productoCantidad.Nombre,
 		Cantidad:       productoCantidad.Cantidad,
 		PrecioUnitario: productoCantidad.PrecioUnitario,
@@ -31,10 +29,11 @@ func (productoCantidad ProductoCantidad) GetModel() model.ProductoCantidad {
 	return model.ProductoCantidad{
 		IDProducto:     utils.GetObjectIDFromStringID(productoCantidad.IDProducto),
 		CodigoProducto: productoCantidad.CodigoProducto,
-		TipoProducto:   productoCantidad.TipoProducto,
 		Nombre:         productoCantidad.Nombre,
 		Cantidad:       productoCantidad.Cantidad,
 		PrecioUnitario: productoCantidad.PrecioUnitario,
 		PesoUnitario:   productoCantidad.PesoUnitario,
 	}
 }
+
+//Metodo que sirve para crear un ProductoCantidad para un pedido

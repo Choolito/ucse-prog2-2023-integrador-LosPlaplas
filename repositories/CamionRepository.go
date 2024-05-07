@@ -12,9 +12,9 @@ import (
 
 type CamionRepositoryInterface interface {
 	//metodos
-	CrearCamion(camion model.Camion) (*mongo.InsertOneResult, error)
+	CrearCamion(camion model.Camion) error
 	ObtenerCamiones() ([]*model.Camion, error)
-	ActualizarCamion(id string, camion model.Camion) (*mongo.UpdateResult, error)
+	ActualizarCamion(id string, camion model.Camion) error
 	EliminarCamion(id string) (*mongo.DeleteResult, error)
 	//envios
 	ObtenerCamionPorID(id string) (*model.Camion, error)
@@ -32,12 +32,12 @@ func NewCamionRepository(db DB) *CamionRepository {
 
 //CRUD de Camion
 
-func (cr *CamionRepository) CrearCamion(camion model.Camion) (*mongo.InsertOneResult, error) {
+func (cr *CamionRepository) CrearCamion(camion model.Camion) error {
 	collection := cr.db.GetClient().Database("LosPlaplas").Collection("camiones")
 	camion.FechaCreacion = time.Now()
 	camion.FechaActualizacion = time.Now()
-	resultado, err := collection.InsertOne(context.TODO(), camion)
-	return resultado, err
+	_, err := collection.InsertOne(context.TODO(), camion)
+	return err
 }
 
 func (cr *CamionRepository) ObtenerCamiones() ([]*model.Camion, error) {
@@ -73,7 +73,7 @@ func (cr *CamionRepository) ObtenerCamionPorID(id string) (*model.Camion, error)
 	return &camion, err
 }
 
-func (cr *CamionRepository) ActualizarCamion(id string, camion model.Camion) (*mongo.UpdateResult, error) {
+func (cr *CamionRepository) ActualizarCamion(id string, camion model.Camion) error {
 	collection := cr.db.GetClient().Database("LosPlaplas").Collection("camiones")
 
 	objectID := utils.GetObjectIDFromStringID(id)
@@ -86,8 +86,8 @@ func (cr *CamionRepository) ActualizarCamion(id string, camion model.Camion) (*m
 			"fechaActualizacion": time.Now(),
 		},
 	}
-	resultado, err := collection.UpdateOne(context.Background(), filtro, update)
-	return resultado, err
+	_, err := collection.UpdateOne(context.Background(), filtro, update)
+	return err
 }
 
 func (cr *CamionRepository) EliminarCamion(id string) (*mongo.DeleteResult, error) {
