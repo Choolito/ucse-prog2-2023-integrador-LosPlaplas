@@ -21,6 +21,8 @@ type ProductoRepositoryInterface interface {
 	DescontarStock(id string, cantidad int) (*mongo.UpdateResult, error)
 
 	ObtenerListaFiltrada(filtro string) ([]*model.Producto, error)
+
+	ObtenerListaConStockMinimo() ([]*model.Producto, error)
 }
 
 type ProductoRepository struct {
@@ -144,4 +146,33 @@ func (pr *ProductoRepository) ObtenerListaFiltrada(filtro string) ([]*model.Prod
 		productos = append(productos, &producto)
 	}
 	return productos, err
+}
+
+func (repo *ProductoRepository) ObtenerListaConStockMinimo() ([]*model.Producto, error) {
+	var productos []*model.Producto
+	collection := repo.db.GetClient().Database("LosPlaplas").Collection("productos")
+	filter := bson.M{
+		"$expr": bson.M{
+			"$lt": []interface{}{"$cantidadEnStock", "$stockMinimo"},
+		},
+	} // Productos con cantidad en stock menor que el stock mínimo
+	cursor, err := collection.Find(context.Background(), filter)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(context.Background())
+
+	for cursor.Next(context.Background()) {
+		var producto model.Producto
+		if err := cursor.Decode(&producto); err != nil {
+			return nil, err
+		}
+		productos = append(productos, &producto)
+	}
+
+	if err := cursor.Err(); err != nil {
+		return nil, err
+	}
+
+	return productos, nil
 }

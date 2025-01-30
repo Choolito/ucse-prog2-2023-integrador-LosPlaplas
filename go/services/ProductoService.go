@@ -53,18 +53,17 @@ func (ps *ProductoService) EliminarProducto(id string) error {
 	return err
 }
 
-func (ps *ProductoService) ObtenerListaConStockMinimo() ([]*dto.Producto, error) {
-	productosDB, err := ps.productoRepository.ObtenerProductos()
-
-	var productos []*dto.Producto
-	for _, productoDB := range productosDB {
-		producto := dto.NewProducto(*productoDB)
-		if producto.CantidadEnStock < producto.StockMinimo {
-			productos = append(productos, producto)
-		}
+func (service *ProductoService) ObtenerListaConStockMinimo() ([]*dto.Producto, error) {
+	// Lógica para obtener productos con stock mínimo
+	productos, err := service.productoRepository.ObtenerListaConStockMinimo()
+	if err != nil {
+		return nil, err
 	}
-
-	return productos, err
+	var productosDTO []*dto.Producto
+	for _, producto := range productos {
+		productosDTO = append(productosDTO, dto.NewProducto(*producto))
+	}
+	return productosDTO, nil
 }
 
 func (ps *ProductoService) ObtenerListaFiltrada(filtro string) ([]*dto.Producto, error) {
