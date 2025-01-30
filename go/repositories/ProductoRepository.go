@@ -7,6 +7,7 @@ import (
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/model"
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/utils"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -19,8 +20,6 @@ type ProductoRepositoryInterface interface {
 	EliminarProducto(id string) (*mongo.DeleteResult, error)
 
 	DescontarStock(id string, cantidad int) (*mongo.UpdateResult, error)
-
-	ObtenerListaFiltrada(filtro string) ([]*model.Producto, error)
 
 	ObtenerListaConStockMinimo() ([]*model.Producto, error)
 }
@@ -98,15 +97,18 @@ func (pr *ProductoRepository) ActualizarProducto(id string, producto model.Produ
 	return resultado, err
 }
 
-func (pr *ProductoRepository) EliminarProducto(id string) (*mongo.DeleteResult, error) {
-	collection := pr.db.GetClient().Database("LosPlaplas").Collection("productos")
+func (repo *ProductoRepository) EliminarProducto(id string) (*mongo.DeleteResult, error) {
+	collection := repo.db.GetClient().Database("LosPlaplas").Collection("productos")
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
 
-	objectID := utils.GetObjectIDFromStringID(id)
-
-	filtro := bson.M{"_id": objectID}
-
-	resultado, err := collection.DeleteOne(context.Background(), filtro)
-	return resultado, err
+	result, err := collection.DeleteOne(context.Background(), bson.M{"_id": objectID})
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 func (pr *ProductoRepository) DescontarStock(id string, cantidad int) (*mongo.UpdateResult, error) {
@@ -126,26 +128,6 @@ func (pr *ProductoRepository) DescontarStock(id string, cantidad int) (*mongo.Up
 	}
 
 	return result, nil
-}
-
-func (pr *ProductoRepository) ObtenerListaFiltrada(filtro string) ([]*model.Producto, error) {
-	collection := pr.db.GetClient().Database("LosPlaplas").Collection("productos")
-	filtroDB := bson.M{"tipoProducto": filtro}
-
-	cursor, err := collection.Find(context.Background(), filtroDB)
-
-	defer cursor.Close(context.Background())
-
-	var productos []*model.Producto
-	for cursor.Next(context.Background()) {
-		var producto model.Producto
-		err := cursor.Decode(&producto)
-		if err != nil {
-			return nil, err
-		}
-		productos = append(productos, &producto)
-	}
-	return productos, err
 }
 
 func (repo *ProductoRepository) ObtenerListaConStockMinimo() ([]*model.Producto, error) {

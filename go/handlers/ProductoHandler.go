@@ -73,13 +73,16 @@ func (handler *ProductoHandler) EliminarProducto(c *gin.Context) {
 	id := c.Param("id")
 
 	err := handler.productoService.EliminarProducto(id)
-
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		if strings.Contains(err.Error(), "no se encontró el producto") {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		}
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"mensaje": "Producto eliminado exitosamente"})
-
 }
 
 func (handler *ProductoHandler) ObtenerListaConStockMinimo(c *gin.Context) {
@@ -110,18 +113,6 @@ func (handler *ProductoHandler) ObtenerListaConStockMinimo(c *gin.Context) {
 
 	c.JSON(http.StatusOK, productosFiltrados)
 }
-
-func (handler *ProductoHandler) ObtenerListaFiltrada(c *gin.Context) {
-	filter := c.Param("filtro")
-
-	resultado, err := handler.productoService.ObtenerListaFiltrada(filter)
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	}
-	c.JSON(http.StatusOK, resultado)
-}
-
 func (handler *ProductoHandler) ObtenerProductoPorID(c *gin.Context) {
 	id := c.Param("id")
 

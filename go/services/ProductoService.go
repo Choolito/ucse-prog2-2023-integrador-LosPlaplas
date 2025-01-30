@@ -1,6 +1,8 @@
 package services
 
 import (
+	"fmt"
+
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/dto"
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/repositories"
 )
@@ -12,7 +14,6 @@ type ProductoInterface interface {
 	ActualizarProducto(id string, producto *dto.Producto) error
 	EliminarProducto(id string) error
 	ObtenerListaConStockMinimo() ([]*dto.Producto, error)
-	ObtenerListaFiltrada(filtro string) ([]*dto.Producto, error)
 	ObtenerProductoPorID(id string) (*dto.Producto, error)
 }
 
@@ -49,10 +50,22 @@ func (ps *ProductoService) ActualizarProducto(id string, producto *dto.Producto)
 }
 
 func (ps *ProductoService) EliminarProducto(id string) error {
-	_, err := ps.productoRepository.EliminarProducto(id)
-	return err
-}
+	// Verificar si el producto existe
+	_, err := ps.productoRepository.ObtenerProductoPorID(id)
+	if err != nil {
+		return fmt.Errorf("no se encontró el producto con el id: %s", id)
+	}
 
+	// Eliminar el producto
+	eliminado, err := ps.productoRepository.EliminarProducto(id)
+	if err != nil {
+		return err
+	}
+	if eliminado.DeletedCount == 0 {
+		return fmt.Errorf("no se pudo eliminar el producto con el id: %s", id)
+	}
+	return nil
+}
 func (service *ProductoService) ObtenerListaConStockMinimo() ([]*dto.Producto, error) {
 	// Lógica para obtener productos con stock mínimo
 	productos, err := service.productoRepository.ObtenerListaConStockMinimo()
@@ -64,18 +77,6 @@ func (service *ProductoService) ObtenerListaConStockMinimo() ([]*dto.Producto, e
 		productosDTO = append(productosDTO, dto.NewProducto(*producto))
 	}
 	return productosDTO, nil
-}
-
-func (ps *ProductoService) ObtenerListaFiltrada(filtro string) ([]*dto.Producto, error) {
-	productosDB, err := ps.productoRepository.ObtenerListaFiltrada(filtro)
-
-	var productos []*dto.Producto
-	for _, productoDB := range productosDB {
-		producto := dto.NewProducto(*productoDB)
-		productos = append(productos, producto)
-	}
-
-	return productos, err
 }
 
 func (ps *ProductoService) ObtenerProductoPorID(id string) (*dto.Producto, error) {
