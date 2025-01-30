@@ -1,6 +1,8 @@
 package services
 
 import (
+	"fmt"
+
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/dto"
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/repositories"
 )
@@ -62,13 +64,26 @@ func (ps *PedidosService) ObtenerPedidos() ([]*dto.Pedidos, error) {
 }
 
 func (ps *PedidosService) EliminarPedido(id string) error {
-	_, err := ps.pedidosRepository.EliminarPedido(id)
-	// if resultado.ModifiedCount != 0 {
-	// 	return true
-	// }
-	// return false
+	pedido, err := ps.pedidosRepository.ObtenerPedidoPorID(id)
+	if err != nil {
+		return err
+	}
 
-	return err
+	estadosNoCancelables := []string{"Aceptado", "Para enviar", "Enviado"}
+	for _, estado := range estadosNoCancelables {
+		if string(pedido.EstadoPedido) == estado {
+			return fmt.Errorf("no se puede eliminar el pedido con el id: %s porque está en estado %s", id, estado)
+		}
+	}
+
+	eliminado, err := ps.pedidosRepository.EliminarPedido(id)
+	if err != nil {
+		return err
+	}
+	if !eliminado {
+		return fmt.Errorf("no se pudo eliminar el pedido con el id: %s", id)
+	}
+	return nil
 }
 
 func (ps *PedidosService) ObtenerPedidosPendientes() ([]*dto.Pedidos, error) {
@@ -84,10 +99,12 @@ func (ps *PedidosService) ObtenerPedidosPendientes() ([]*dto.Pedidos, error) {
 }
 
 func (ps *PedidosService) ActualizarPedidoAceptado(id string) error {
-	_, err := ps.pedidosRepository.ActualizarPedidoAceptado(id)
-	// if resultado.ModifiedCount != 0 {
-	// 	return true
-	// }
-	// return false
-	return err
+	resultado, err := ps.pedidosRepository.ActualizarPedidoAceptado(id)
+	if err != nil {
+		return err
+	}
+	if resultado.ModifiedCount == 0 {
+		return fmt.Errorf("no se pudo actualizar el pedido con el id: %s", id)
+	}
+	return nil
 }

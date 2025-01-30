@@ -16,7 +16,7 @@ type PedidosRepositoryInterface interface {
 	CrearPedido(pedido model.Pedidos) (*mongo.InsertOneResult, error)
 	ObtenerPedidos() ([]*model.Pedidos, error)
 	ActualizarPedido(pedido *model.Pedidos) error
-	EliminarPedido(id string) (*mongo.UpdateResult, error)
+	EliminarPedido(id string) (bool, error)
 	ObtenerPedidosPendientes() ([]*model.Pedidos, error)
 	ActualizarPedidoAceptado(id string) (*mongo.UpdateResult, error)
 
@@ -100,7 +100,7 @@ func (pr *PedidosRepository) ActualizarPedido(pedido *model.Pedidos) error {
 	return err
 }
 
-func (pr *PedidosRepository) EliminarPedido(id string) (*mongo.UpdateResult, error) {
+func (pr *PedidosRepository) EliminarPedido(id string) (bool, error) {
 	collection := pr.db.GetClient().Database("LosPlaplas").Collection("pedidos")
 
 	objectID := utils.GetObjectIDFromStringID(id)
@@ -119,7 +119,10 @@ func (pr *PedidosRepository) EliminarPedido(id string) (*mongo.UpdateResult, err
 		},
 	}
 	resultado, err := collection.UpdateOne(context.Background(), filtro, update)
-	return resultado, err
+	if err != nil {
+		return false, err
+	}
+	return resultado.ModifiedCount > 0, nil
 }
 
 // Lista pedidos pendientes

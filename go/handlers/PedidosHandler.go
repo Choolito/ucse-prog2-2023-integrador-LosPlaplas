@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/dto"
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/services"
@@ -35,6 +36,7 @@ func (ph *PedidosHandler) CrearPedido(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 
 	c.JSON(http.StatusCreated, gin.H{"mensaje": "Pedido creado exitosamente"})
@@ -44,6 +46,7 @@ func (ph *PedidosHandler) ObtenerPedidos(c *gin.Context) {
 	pedidos, err := ph.pedidosService.ObtenerPedidos()
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 
 	c.JSON(http.StatusOK, pedidos)
@@ -56,7 +59,12 @@ func (ph *PedidosHandler) EliminarPedido(c *gin.Context) {
 	err := ph.pedidosService.EliminarPedido(id)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		if strings.Contains(err.Error(), "no se puede eliminar el pedido") {
+			c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		}
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"mensaje": "Pedido eliminado exitosamente"})
@@ -66,6 +74,7 @@ func (ph *PedidosHandler) ObtenerPedidosPendientes(c *gin.Context) {
 	pedidos, err := ph.pedidosService.ObtenerPedidosPendientes()
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 
 	c.JSON(http.StatusOK, pedidos)
@@ -77,6 +86,7 @@ func (ph *PedidosHandler) ActualizarPedidoAceptado(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"mensaje": "Pedido actualizado a aceptado exitosamente"})
