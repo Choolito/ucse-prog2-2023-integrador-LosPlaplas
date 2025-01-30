@@ -67,7 +67,7 @@ func (ph *PedidosHandler) EliminarPedido(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"mensaje": "Pedido eliminado exitosamente"})
+	c.JSON(http.StatusNoContent, gin.H{"mensaje": "Pedido eliminado exitosamente"})
 }
 
 func (ph *PedidosHandler) ObtenerPedidosPendientes(c *gin.Context) {

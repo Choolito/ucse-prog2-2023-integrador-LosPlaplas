@@ -90,5 +90,5 @@ func (ch *CamionHandler) EliminarCamion(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
 
-	c.JSON(http.StatusOK, gin.H{"mensaje": "Camion eliminado exitosamente"})
+	c.JSON(http.StatusNoContent, gin.H{"mensaje": "Camion eliminado exitosamente"})
 }

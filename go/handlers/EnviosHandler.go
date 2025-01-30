@@ -38,7 +38,7 @@ func (enviosHandler *EnviosHandler) CrearEnvio(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
 
-	c.JSON(http.StatusOK, gin.H{"mensaje": "Envio creado exitosamente"})
+	c.JSON(http.StatusCreated, gin.H{"mensaje": "Envio creado exitosamente"})
 
 }
 

@@ -25,18 +25,22 @@ func (handler *ProductoHandler) CrearProducto(c *gin.Context) {
 	var producto dto.Producto
 
 	if err := c.ShouldBindJSON(&producto); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Datos inválidos"})
+		return
+	}
+
+	if err := producto.Validate(); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	err := handler.productoService.CrearProducto(&producto)
-
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 
 	c.JSON(http.StatusCreated, gin.H{"mensaje": "Producto creado exitosamente"})
-
 }
 
 func (handler *ProductoHandler) ObtenerProductos(c *gin.Context) {
@@ -82,7 +86,7 @@ func (handler *ProductoHandler) EliminarProducto(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"mensaje": "Producto eliminado exitosamente"})
+	c.JSON(http.StatusNoContent, gin.H{"mensaje": "Producto eliminado exitosamente"})
 }
 
 func (handler *ProductoHandler) ObtenerListaConStockMinimo(c *gin.Context) {
