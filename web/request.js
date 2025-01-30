@@ -60,9 +60,11 @@ async function makeRequest(
   }
 
   //Validar que si la pegada es privada exista bearer token, si existe lo agrega como header authorization, sino va a login.html
+  const isLocalEnvironment = window.location.hostname === "127.0.0.1";
+
   const token = localStorage.getItem("authToken");
-  if (isPrivateCall && !token) {
-    window.location = "login.html?reason=private_call_without_token";
+  if (isPrivateCall && !token  && !isLocalEnvironment) {
+    window.location = "/web/login.html?reason=private_call_without_token";
     return;
   }
 
