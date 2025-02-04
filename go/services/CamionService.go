@@ -1,6 +1,8 @@
 package services
 
 import (
+	"fmt"
+
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/dto"
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/repositories"
 )
@@ -55,13 +57,37 @@ func (cs *CamionService) ObtenerCamionPorID(id string) (*dto.Camion, error) {
 }
 
 func (cs *CamionService) ActualizarCamion(id string, camion *dto.Camion) error {
-	err := cs.camionRepository.ActualizarCamion(id, camion.GetModel())
+	// Verificar si el camión existe
+	_, err := cs.camionRepository.ObtenerCamionPorID(id)
+	if err != nil {
+		return fmt.Errorf("no se encontró el camión con el id: %s", id)
+	}
 
-	return err
+	// Actualizar el camión
+	result, err := cs.camionRepository.ActualizarCamion(id, camion.GetModel())
+	if err != nil {
+		return err
+	}
+	if result.MatchedCount == 0 {
+		return fmt.Errorf("no se encontró el camión con el id: %s", id)
+	}
+	return nil
 }
 
 func (cs *CamionService) EliminarCamion(id string) error {
-	_, err := cs.camionRepository.EliminarCamion(id)
+	// Verificar si el camión existe
+	_, err := cs.camionRepository.ObtenerCamionPorID(id)
+	if err != nil {
+		return fmt.Errorf("no se encontró el camión con el id: %s", id)
+	}
 
-	return err
+	// Eliminar el camión
+	eliminado, err := cs.camionRepository.EliminarCamion(id)
+	if err != nil {
+		return err
+	}
+	if eliminado.DeletedCount == 0 {
+		return fmt.Errorf("no se pudo eliminar el camión con el id: %s", id)
+	}
+	return nil
 }

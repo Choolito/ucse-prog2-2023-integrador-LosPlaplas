@@ -7,6 +7,7 @@ import (
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/model"
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/utils"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -14,7 +15,7 @@ type CamionRepositoryInterface interface {
 	//metodos
 	CrearCamion(camion model.Camion) error
 	ObtenerCamiones() ([]*model.Camion, error)
-	ActualizarCamion(id string, camion model.Camion) error
+	ActualizarCamion(id string, camion model.Camion) (*mongo.UpdateResult, error)
 	EliminarCamion(id string) (*mongo.DeleteResult, error)
 	//envios
 	ObtenerCamionPorID(id string) (*model.Camion, error)
@@ -73,30 +74,38 @@ func (cr *CamionRepository) ObtenerCamionPorID(id string) (*model.Camion, error)
 	return &camion, err
 }
 
-func (cr *CamionRepository) ActualizarCamion(id string, camion model.Camion) error {
-	collection := cr.db.GetClient().Database("LosPlaplas").Collection("camiones")
+func (repo *CamionRepository) ActualizarCamion(id string, camion model.Camion) (*mongo.UpdateResult, error) {
+	collection := repo.db.GetClient().Database("LosPlaplas").Collection("camiones")
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
 
-	objectID := utils.GetObjectIDFromStringID(id)
-
-	filtro := bson.M{"_id": objectID}
-
+	filter := bson.M{"_id": objectID}
 	update := bson.M{
 		"$set": bson.M{
 			"costoPorKilometro":  camion.CostoPorKilometro,
 			"fechaActualizacion": time.Now(),
 		},
 	}
-	_, err := collection.UpdateOne(context.Background(), filtro, update)
-	return err
+
+	result, err := collection.UpdateOne(context.Background(), filter, update)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
-func (cr *CamionRepository) EliminarCamion(id string) (*mongo.DeleteResult, error) {
-	collection := cr.db.GetClient().Database("LosPlaplas").Collection("camiones")
+func (repo *CamionRepository) EliminarCamion(id string) (*mongo.DeleteResult, error) {
+	collection := repo.db.GetClient().Database("LosPlaplas").Collection("camiones")
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
 
-	objectID := utils.GetObjectIDFromStringID(id)
-
-	filtro := bson.M{"_id": objectID}
-
-	resultado, err := collection.DeleteOne(context.Background(), filtro)
-	return resultado, err
+	result, err := collection.DeleteOne(context.Background(), bson.M{"_id": objectID})
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }

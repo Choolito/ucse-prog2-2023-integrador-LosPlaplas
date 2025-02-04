@@ -88,7 +88,6 @@ func (handler *ProductoHandler) EliminarProducto(c *gin.Context) {
 
 	c.JSON(http.StatusNoContent, gin.H{"mensaje": "Producto eliminado exitosamente"})
 }
-
 func (handler *ProductoHandler) ObtenerListaConStockMinimo(c *gin.Context) {
 	// Obtener la lista de productos con stock mínimo
 	resultado, err := handler.productoService.ObtenerListaConStockMinimo()

@@ -22,14 +22,8 @@ type Producto struct {
 	FechaActualizacion time.Time          `json:"fechaActualizacion"`
 }
 
-var validate *validator.Validate
-
-func init() {
-	validate = validator.New()
-}
-
 func (p *Producto) Validate() error {
-	err := validate.Struct(p)
+	err := utils.Validate.Struct(p)
 	if err != nil {
 		if _, ok := err.(*validator.InvalidValidationError); ok {
 			return err

@@ -1,19 +1,42 @@
 package dto
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/model"
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/utils"
+	"github.com/go-playground/validator/v10"
 )
 
 type Camion struct {
-	ID                 string
-	Patente            string
-	PesoMaximo         int
-	CostoPorKilometro  int
-	FechaCreacion      time.Time
-	FechaActualizacion time.Time
+	ID                 string    `json:"id"`
+	Patente            string    `json:"patente" validate:"required"`
+	PesoMaximo         int       `json:"pesoMaximo" validate:"required,gt=0"`
+	CostoPorKilometro  int       `json:"costoPorKilometro" validate:"required,gt=0"`
+	FechaCreacion      time.Time `json:"fechaCreacion"`
+	FechaActualizacion time.Time `json:"fechaActualizacion"`
+}
+
+func (c *Camion) Validate() error {
+	err := utils.Validate.Struct(c)
+	if err != nil {
+		if _, ok := err.(*validator.InvalidValidationError); ok {
+			return err
+		}
+
+		for _, err := range err.(validator.ValidationErrors) {
+			switch err.Field() {
+			case "Patente":
+				return fmt.Errorf("La patente del camión es obligatoria")
+			case "PesoMaximo":
+				return fmt.Errorf("El peso máximo es obligatorio y debe ser un número positivo")
+			case "CostoPorKilometro":
+				return fmt.Errorf("El costo por kilómetro es obligatorio y debe ser un número positivo")
+			}
+		}
+	}
+	return nil
 }
 
 func NewCamion(camion model.Camion) *Camion {
