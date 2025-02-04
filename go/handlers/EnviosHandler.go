@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"net/http"
+	"strings"
 
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/dto"
 )
@@ -28,18 +29,27 @@ func (enviosHandler *EnviosHandler) CrearEnvio(c *gin.Context) {
 	var envio dto.Envio
 
 	if err := c.ShouldBindJSON(&envio); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Datos inválidos"})
 		return
 	}
 
 	err := enviosHandler.enviosService.CrearEnvio(&envio)
-
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		if strings.Contains(err.Error(), "el camión no puede estar vacío") {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		} else if strings.Contains(err.Error(), "no se encontró el camión") {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		} else if strings.Contains(err.Error(), "los pedidos no pueden estar vacíos") {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		} else if strings.Contains(err.Error(), "el peso total de los pedidos supera el peso máximo del camión") {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+		return
 	}
 
 	c.JSON(http.StatusCreated, gin.H{"mensaje": "Envio creado exitosamente"})
-
 }
 
 func (enviosHandler *EnviosHandler) ObtenerEnvio(c *gin.Context) {

@@ -9,8 +9,8 @@ import (
 
 type Envio struct {
 	ID                 string
-	IDCamion           string
-	Pedidos            []string
+	IDCamion           string   `validate:"required"`
+	Pedidos            []string `validate:"required"`
 	Paradas            []Parada
 	Estado             model.EstadoEnvio
 	FechaCreacion      time.Time

@@ -39,22 +39,38 @@ func NewEnviosService(enviosRepository repositories.EnviosRepositoryInterface, p
 
 //metodos
 
-//Se genere un envio
-//Envio pasa a estado "A despachar".
+// Se genere un envio
+// Envio pasa a estado "A despachar".
+func (es *EnviosService) CrearEnvio(envio *dto.Envio) error {
+	// Verificar que el camión no esté vacío
+	if envio.IDCamion == "" {
+		return fmt.Errorf("el camión no puede estar vacío")
+	}
 
-func (enviosService *EnviosService) CrearEnvio(envio *dto.Envio) error {
-	camion, _ := enviosService.camionRepository.ObtenerCamionPorID(envio.IDCamion)
+	// Verificar que el camión exista
+	camion, err := es.camionRepository.ObtenerCamionPorID(envio.IDCamion)
+	if err != nil {
+		return fmt.Errorf("no se encontró el camión con el id: %s", envio.IDCamion)
+	}
+
+	// Verificar que los pedidos no estén vacíos
+	if len(envio.Pedidos) == 0 {
+		return fmt.Errorf("los pedidos no pueden estar vacíos")
+	}
+
+	// Verificar que el peso total de los pedidos no supere el peso máximo del camión
 	pesoMaximo := camion.PesoMaximo
-
 	pedidos := envio.Pedidos
 	var pedidosEnvio []*model.Pedidos
-	for _, pedido := range pedidos {
-		pedidoBuscado, _ := enviosService.pedidosRepository.ObtenerPedidoPorID(pedido)
-		pedidosEnvio = append(pedidosEnvio, pedidoBuscado)
+	for _, pedidoID := range pedidos {
+		pedido, err := es.pedidosRepository.ObtenerPedidoPorID(pedidoID)
+		if err != nil {
+			return fmt.Errorf("no se encontró el pedido con el id: %s", pedidoID)
+		}
+		pedidosEnvio = append(pedidosEnvio, pedido)
 	}
 
 	pesoTotalPedidos := 0
-
 	for _, pedido := range pedidosEnvio {
 		for _, producto := range pedido.ListaProductos {
 			pesoTotalPedidos += producto.PesoUnitario * producto.Cantidad
@@ -62,17 +78,16 @@ func (enviosService *EnviosService) CrearEnvio(envio *dto.Envio) error {
 	}
 
 	if pesoTotalPedidos > pesoMaximo {
-		return errors.New("El peso total de los pedidos supera el peso maximo del camion")
+		return fmt.Errorf("el peso total de los pedidos supera el peso máximo del camión")
 	}
 
-	//Pasar a estado "Para enviar"
-	for _, pedido := range pedidosEnvio {
-		enviosService.pedidosRepository.ActualizarPedidoParaEnviar(pedido.ID.Hex())
+	// Crear el envío
+	envioModel := envio.GetModel()
+	err = es.enviosRepository.CrearEnvio(envioModel)
+	if err != nil {
+		return err
 	}
-
-	err := enviosService.enviosRepository.CrearEnvio(envio.GetModel())
-
-	return err
+	return nil
 }
 
 func (enviosService *EnviosService) ObtenerEnvio() ([]*dto.Envio, error) {
