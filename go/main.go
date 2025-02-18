@@ -75,35 +75,32 @@ func mappingRoutes() {
 }
 
 func dependencies() {
-	//DB
-	//var database repositories.DB
+	//var
 	database := repositories.NewMongoDB()
-
-	//Camion
 	var camionRepository repositories.CamionRepositoryInterface
 	var camionService services.CamionInterface
+	var productoRepository repositories.ProductoRepositoryInterface
+	var productoService services.ProductoInterface
+	var pedidosRepository repositories.PedidosRepositoryInterface
+	var pedidosService services.PedidosInterface
+	var enviosRepository repositories.EnviosRepositoryInterface
+	var enviosService services.EnviosInterface
+
+	//Producto
+	productoRepository = repositories.NewProductoRepository(database)
+	productoService = services.NewProductoService(productoRepository)
+	productoHandler = handlers.NewProductoHandler(productoService)
+	//Pedidos
+	pedidosRepository = repositories.NewPedidosRepository(database)
+	pedidosService = services.NewPedidosService(pedidosRepository, productoRepository)
+	pedidosHandler = handlers.NewPedidosHandler(pedidosService)
+	//Envios
+	enviosRepository = repositories.NewEnviosRepository(database)
+	enviosService = services.NewEnviosService(enviosRepository, pedidosRepository, camionRepository, productoRepository)
+	enviosHandler = handlers.NewEnviosHandler(enviosService)
+	//Camion
 	camionRepository = repositories.NewCamionRepository(database)
 	camionService = services.NewCamionService(camionRepository)
 	camionHandler = handlers.NewCamionHandler(camionService)
 
-	//Producto
-	var productoRepository repositories.ProductoRepositoryInterface
-	var productoService services.ProductoInterface
-	productoRepository = repositories.NewProductoRepository(database)
-	productoService = services.NewProductoService(productoRepository)
-	productoHandler = handlers.NewProductoHandler(productoService)
-
-	//Pedidos
-	var pedidosRepository repositories.PedidosRepositoryInterface
-	var pedidosService services.PedidosInterface
-	pedidosRepository = repositories.NewPedidosRepository(database)
-	pedidosService = services.NewPedidosService(pedidosRepository, productoRepository)
-	pedidosHandler = handlers.NewPedidosHandler(pedidosService)
-
-	//Envios
-	var enviosRepository repositories.EnviosRepositoryInterface
-	var enviosService services.EnviosInterface
-	enviosRepository = repositories.NewEnviosRepository(database)
-	enviosService = services.NewEnviosService(enviosRepository, pedidosRepository, camionRepository)
-	enviosHandler = handlers.NewEnviosHandler(enviosService)
 }

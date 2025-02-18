@@ -9,8 +9,8 @@ import (
 
 type Pedidos struct {
 	ID                  string
-	ListaProductos      []ProductoCantidad
-	CiudadDestinoPedido string
+	ListaProductos      []ProductoCantidad `validate:"required,dive"`
+	CiudadDestinoPedido string             `validate:"required"`
 	EstadoPedido        model.EstadoPedido
 	FechaCreacion       time.Time
 	FechaActualizacion  time.Time

@@ -43,6 +43,8 @@ func (enviosHandler *EnviosHandler) CrearEnvio(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		} else if strings.Contains(err.Error(), "el peso total de los pedidos supera el peso máximo del camión") {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		} else if strings.Contains(err.Error(), "el pedido con el id") && strings.Contains(err.Error(), "no está en estado 'Aceptado'") {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		} else {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		}

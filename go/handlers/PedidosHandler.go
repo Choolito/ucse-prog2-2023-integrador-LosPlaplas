@@ -3,9 +3,13 @@ package handlers
 import (
 	"net/http"
 	"strings"
+	"time"
+
+	"github.com/go-playground/validator/v10"
 
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/dto"
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/services"
+	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -32,10 +36,20 @@ func (ph *PedidosHandler) CrearPedido(c *gin.Context) {
 		return
 	}
 
+	validate := validator.New()
+	if err := validate.Struct(pedido); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	err := ph.pedidosService.CrearPedido(&pedido)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		if strings.Contains(err.Error(), "no se encontró el producto") {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
 		return
 	}
 
@@ -44,6 +58,40 @@ func (ph *PedidosHandler) CrearPedido(c *gin.Context) {
 
 func (ph *PedidosHandler) ObtenerPedidos(c *gin.Context) {
 	pedidos, err := ph.pedidosService.ObtenerPedidos()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, pedidos)
+}
+
+func (eh *EnviosHandler) ObtenerPedidosFiltrados(c *gin.Context) {
+	estado := c.Query("estado")
+	fechaInicioStr := c.Query("fechaInicio")
+	fechaFinStr := c.Query("fechaFin")
+	codigoEnvio := c.Query("codigoEnvio")
+
+	fechaInicio, errInicio := time.Parse("02/01/2006", fechaInicioStr)
+	if errInicio != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": errInicio.Error()})
+		return
+	}
+
+	fechaFin, errFin := time.Parse("02/01/2006", fechaFinStr)
+	if errFin != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": errFin.Error()})
+		return
+	}
+
+	filtro := utils.FiltroPedido{
+		Estado:                estado,
+		FechaCreacionComienzo: fechaInicio,
+		FechaCreacionFin:      fechaFin,
+		IdEnvio:               codigoEnvio,
+	}
+
+	pedidos, err := eh.enviosService.ObtenerPedidosFiltrados(&filtro)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

@@ -6,10 +6,10 @@ import (
 )
 
 type ProductoCantidad struct {
-	IDProducto     string
+	IDProducto     string `validate:"required"`
 	CodigoProducto string
 	Nombre         string
-	Cantidad       int
+	Cantidad       int `validate:"required,gt=0"`
 	PrecioUnitario int
 	PesoUnitario   int
 }

@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"errors"
+	"log"
 
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/model"
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/utils"
@@ -25,6 +26,8 @@ type EnviosRepositoryInterface interface {
 	IniciarViajeEnvio(id string) (*mongo.UpdateResult, error)
 	GenerarParadaEnvio(id string, parada model.Parada) (*mongo.UpdateResult, error)
 	FinalizarViajeEnvio(id string) (*mongo.UpdateResult, error)
+
+	ObtenerPedidosFiltro(codigoEnvio string, estado string, fechaInicio time.Time, fechaFinal time.Time) ([]model.Pedidos, error)
 }
 
 type EnviosRepository struct {
@@ -158,4 +161,36 @@ func (EnviosRepository *EnviosRepository) ActualizarEnvio(envio *model.Envio) er
 	}
 
 	return err
+}
+
+func (enviosRepository *EnviosRepository) ObtenerPedidosFiltro(codigoEnvio string, estado string, fechaInicio time.Time, fechaFinal time.Time) ([]model.Pedidos, error) {
+	collection := enviosRepository.db.GetClient().Database("LosPlaplas").Collection("envios")
+	filtro := bson.M{}
+	if codigoEnvio != "" {
+		filtro["codigoEnvio"] = codigoEnvio
+	}
+	if estado != "" {
+		filtro["estadoPedido"] = estado
+	}
+	if !fechaInicio.IsZero() {
+		filtro["fechaCreacion"] = bson.M{"$gte": fechaInicio}
+	}
+	if !fechaFinal.IsZero() {
+		filtro["fechaCreacion"] = bson.M{"$lte": fechaFinal}
+	}
+	cursor, err := collection.Find(context.Background(), filtro)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(context.Background())
+	var pedidos []model.Pedidos
+	for cursor.Next(context.Background()) {
+		var pedido model.Pedidos
+		if err := cursor.Decode(&pedido); err != nil {
+			log.Printf("Error al decodificar pedido: %v", err)
+			continue
+		}
+		pedidos = append(pedidos, pedido)
+	}
+	return pedidos, nil
 }

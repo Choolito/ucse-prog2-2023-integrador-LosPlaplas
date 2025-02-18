@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 
+	"log"
+
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/dto"
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/model"
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/repositories"
@@ -18,6 +20,7 @@ type EnviosInterface interface {
 	FinalizarViajeEnvio(id string, paradaDestino dto.Parada) error
 	ObtenerEnvio() ([]*dto.Envio, error)
 	CambiarEstadoEnvio(envio *dto.Envio, user *dto.User) (bool, error)
+	ObtenerPedidosFiltrados(filtro *utils.FiltroPedido) ([]*dto.Pedidos, error)
 }
 
 type EnviosService struct {
@@ -28,11 +31,12 @@ type EnviosService struct {
 }
 
 func NewEnviosService(enviosRepository repositories.EnviosRepositoryInterface, pedidosRepository repositories.PedidosRepositoryInterface,
-	camionRepository repositories.CamionRepositoryInterface) *EnviosService {
+	camionRepository repositories.CamionRepositoryInterface, productoRepository repositories.ProductoRepositoryInterface) *EnviosService {
 	return &EnviosService{
-		enviosRepository:  enviosRepository,
-		pedidosRepository: pedidosRepository,
-		camionRepository:  camionRepository,
+		enviosRepository:   enviosRepository,
+		pedidosRepository:  pedidosRepository,
+		camionRepository:   camionRepository,
+		productoRepository: productoRepository,
 		//llamar desde aca todos los repositorios que necesite
 	}
 }
@@ -67,6 +71,9 @@ func (es *EnviosService) CrearEnvio(envio *dto.Envio) error {
 		if err != nil {
 			return fmt.Errorf("no se encontró el pedido con el id: %s", pedidoID)
 		}
+		if pedido.EstadoPedido != "Aceptado" {
+			return fmt.Errorf("el pedido con el id %s no está en estado 'Aceptado' y no puede ser incluido en el envío", pedidoID)
+		}
 		pedidosEnvio = append(pedidosEnvio, pedido)
 	}
 
@@ -86,6 +93,12 @@ func (es *EnviosService) CrearEnvio(envio *dto.Envio) error {
 	err = es.enviosRepository.CrearEnvio(envioModel)
 	if err != nil {
 		return err
+	}
+	for _, pedido := range pedidosEnvio {
+		_, err := es.pedidosRepository.ActualizarPedidoParaEnviar(pedido.ID.Hex())
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -209,4 +222,23 @@ func (enviosService *EnviosService) entregarPedido(pedidoPorEntregar *dto.Pedido
 
 	//Actualiza el pedido en la base de datos
 	return enviosService.pedidosRepository.ActualizarPedido(pedido)
+}
+
+func (envioService *EnviosService) ObtenerPedidosFiltrados(filtro *utils.FiltroPedido) ([]*dto.Pedidos, error) {
+	if filtro == nil {
+		err := errors.New("el filtro no puede ser nulo")
+		log.Printf("[service:EnvioService][method:ObtenerPedidosFiltro][reason:INVALID_INPUT][error:%v]", err)
+		return nil, err
+	}
+	pedidoDB, err := envioService.enviosRepository.ObtenerPedidosFiltro(filtro.IdEnvio, filtro.Estado, filtro.FechaCreacionComienzo, filtro.FechaCreacionFin)
+	if err != nil {
+		log.Printf("[service:EnvioService][method:ObtenerPedidosFiltro][reason:ERROR][error:%v]", err)
+		return nil, err
+	}
+	var pedidos []*dto.Pedidos
+	for _, pedidoDB := range pedidoDB {
+		pedido := dto.NewPedidos(pedidoDB)
+		pedidos = append(pedidos, pedido)
+	}
+	return pedidos, nil
 }
