@@ -4,97 +4,88 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="origin">
-    <title>Envios</title>
+    <title>Envíos - Distribuidora Los Plaplas</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
-
-    <link href="/web/styles/estilos.css" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="/web/styles/envios-styles.css" rel="stylesheet">
 </head>
-<body>  
-    <div class="encabezado_titulo">
-        <img src="/web/wapp.jpg" class="imagen">
-        <h2 class="titulo">Distribuidora Los Plaplas</h2>
-    </div>
-    <!-- Agrega los botones de navegación -->
-    <div class="barra-navegacion">
+<body>
+    <header class="header">
+        <div class="header-content">
+            <img src="/web/icono.jpg" alt="Logo" class="logo">
+            <h1 class="company-name">Distribuidora Los Plaplas</h1>
+        </div>
+    </header>
+    <nav class="navigation">
         <a href="/web/index_inicio.html">Inicio</a>
         <a href="/web/productos/index_producto.html">Productos</a>
         <a href="/web/pedidos/index_pedido.html">Pedidos</a>
         <a href="/web/camiones/index_camion.html">Camiones</a>
-        <a href="/web/envios/index_envio.html">Envíos</a>
-    </div>
-    </div>
-        <h3>Envios</h3>
-    </div>
-   
-    <div class="botonera">
-        <a href="form_envio.html">Crear envio</a>
-        <a href="form_parada.html">Ingresar parada</a>
-    </div>
-    <div class="filtro-container">
-        <div class="filtro-title">
-            <h2>Filtros</h2>
+        <a href="/web/envios/index_envio.html" class="active">Envíos</a>
+    </nav>
+    <main class="main-content">
+        <h2>Envíos</h2>
+        <div class="botonera">
+            <a href="form_envio.html">Crear envío</a>
+            <a href="form_parada.html">Ingresar parada</a>
         </div>
-        <div class="filtro-filters">
-            <div class="filtro-item">
-                <label for="patente">Patente:</label>
-                <input type="text" id="patente" name="patente">
+        <div class="filtro-container">
+            <div class="filtro-title">
+                <h3>Filtros de búsqueda</h3>
             </div>
-    
-            <div class="filtro-item">
-                <label for="estado">Estado:</label>
-                <select id="estado" name="estado">
-                    <option value="">Seleccione un estado</option>
-                    <option value="A despachar">A despachar</option>
-                    <option value="En ruta">En ruta</option>
-                    <option value="Despachado">Despachado</option>
-                </select>
-            </div>
-            
-            <div class="filtro-item">
-                <label for="ultimaParada">Ultima parada:</label>
-                <input type="text" id="ultimaParada" name="ultimaParada">
-            </div>
-
-            <div class="filtro-item">
-                <label for="fecha-inicio">Fecha de Inicio:</label>
-                <input type="date" id="fecha-inicio" name="fecha-inicio">
-            </div>
-    
-            <div class="filtro-item">
-                <label for="fecha-fin">Fecha de Fin:</label>
-                <input type="date" id="fecha-fin" name="fecha-fin">
-            </div>
+            <form id="filtro-form">
+                <div class="filtro-filters">
+                    <div class="filtro-item">
+                        <label for="patente">Patente:</label>
+                        <input type="text" id="patente" name="patente" placeholder="Ingrese la patente">
+                    </div>
+                    <div class="filtro-item">
+                        <label for="estado">Estado:</label>
+                        <select id="estado" name="estado">
+                            <option value="">Todos los estados</option>
+                            <option value="A despachar">A despachar</option>
+                            <option value="En ruta">En ruta</option>
+                            <option value="Despachado">Despachado</option>
+                        </select>
+                    </div>
+                    <div class="filtro-item">
+                        <label for="ultimaParada">Última parada:</label>
+                        <input type="text" id="ultimaParada" name="ultimaParada" placeholder="Ciudad de última parada">
+                    </div>
+                    <div class="filtro-item">
+                        <label for="fecha-inicio">Fecha de Inicio:</label>
+                        <input type="date" id="fecha-inicio" name="fecha-inicio">
+                    </div>
+                    <div class="filtro-item">
+                        <label for="fecha-fin">Fecha de Fin:</label>
+                        <input type="date" id="fecha-fin" name="fecha-fin">
+                    </div>
+                </div>
+                <div class="filtro-buttons">
+                    <button type="submit" class="filtro-button primary">Aplicar Filtros</button>
+                    <button type="reset" class="filtro-button secondary">Limpiar Filtros</button>
+                </div>
+            </form>
         </div>
-    
-        <div class="filtro-buttons">
-            <button class="filtro-button">Filtrar</button>
-            <button class="filtro-button secondary">Quitar Filtros</button>
-        </div>
-    </div>
-    <table id="elementosTable" cellspacing="0" cellpadding="0">
-        <thead> <!-- engloba todas las filas de encabezado -->
-            <tr>
-                <th>Patente</th>
-                <th>Ciudad</th>
-                <th>Kilometros recorridos</th>
-                <th>Estado</th>
-                <th>Generar parada</th>
-                <th>Iniciar|Finalizar</th>
-            </tr>
-        </thead>
-        <tbody> <!-- Todas las filas de datos -->
-            
-        </tbody>
-        <tfoot> <!-- Todas las filas de pie -->
-
-        </tfoot>
-    </table>
-    
+        <table id="elementosTable">
+            <thead>
+                <tr>
+                    <th>Patente</th>
+                    <th>Ciudad</th>
+                    <th>Kilómetros recorridos</th>
+                    <th>Estado</th>
+                    <th>Generar parada</th>
+                    <th>Iniciar|Finalizar</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Table content will be dynamically populated -->
+            </tbody>
+        </table>
+    </main>
     <script src="scripts.js"></script>
     <script src="/web/request.js"></script>
 </body>
 </html>
+

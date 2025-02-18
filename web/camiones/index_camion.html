@@ -4,52 +4,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="origin">
-    <title>Camiones</title>
+    <title>Camiones - Distribuidora Los Plaplas</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
-
-    <link href="/web/styles/estilos.css" rel="stylesheet">
-
+    <link href="/web/styles/camiones-styles.css" rel="stylesheet">
 </head>
 <body>
-    <div class="encabezado_titulo">
-        <img src="/web/wapp.jpg" class="imagen">
-        <h2 class="titulo">Distribuidora Los Plaplas</h2>
-    </div>
-    <!-- Agrega los botones de navegación -->
-    <div class="barra-navegacion">
+    <header class="header">
+        <div class="header-content">
+            <img src="/web/icono.jpg" alt="Logo" class="logo">
+            <h1 class="company-name">Distribuidora Los Plaplas</h1>
+        </div>
+    </header>
+    <nav class="navigation">
         <a href="/web/index_inicio.html">Inicio</a>
         <a href="/web/productos/index_producto.html">Productos</a>
         <a href="/web/pedidos/index_pedido.html">Pedidos</a>
-        <a href="/web/camiones/index_camion.html">Camiones</a>
+        <a href="/web/camiones/index_camion.html" class="active">Camiones</a>
         <a href="/web/envios/index_envio.html">Envíos</a>
-    </div>
-    </div>
-        <h3>Camiones</h3>
-    </div>
-    <div class="botonera">
-        <a href="form_nuevo_camion.html">Nuevo camion</a>
-    </div>
-    <table id="elementosTable" cellspacing="0" cellpadding="0">
-        <thead> <!-- engloba todas las filas de encabezado -->
-            <tr>
-                <th>Patente</th>
-                <th>Peso total</th>
-                <th>Costo por km</th>
-                <th>Editar|Eliminar</th>
-            </tr>
-        </thead>
-        <tbody> <!-- Todas las filas de datos -->
-            
-        </tbody>
-        <tfoot> <!-- Todas las filas de pie -->
-
-        </tfoot>
-    </table>
-    
+    </nav>
+    <main class="main-content">
+        <h2>Camiones</h2>
+        <div class="botonera">
+            <a href="form_nuevo_camion.html">Nuevo camión</a>
+        </div>
+        <table id="elementosTable">
+            <thead>
+                <tr>
+                    <th>Patente</th>
+                    <th>Peso total</th>
+                    <th>Costo por km</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Table content will be dynamically populated -->
+            </tbody>
+        </table>
+    </main>
     <script src="scripts.js"></script>
     <script src="/web/request.js"></script>
 </body>
 </html>
+

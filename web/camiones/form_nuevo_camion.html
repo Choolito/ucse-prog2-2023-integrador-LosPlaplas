@@ -1,43 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nuevo Camión</title>
     <meta name="referrer" content="origin">
+    <title>Nuevo Camión - Distribuidora Los Plaplas</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
-    <link href="/web/styles/styles_form.css" rel="stylesheet"> <!-- Reemplaza "styles_form.css" con la ruta correcta a tu archivo de estilos -->
+    <link href="/web/styles/camiones-styles.css" rel="stylesheet">
 </head>
-
 <body>
-    <div class="formulario">
-        <h2>Nuevo Camión</h2>
-        <form action="/" method="post" id="form">
-            <div class="form-group">
-                <label for="Patente">Patente:</label>
-                <input type="text" name="Patente" id="Patente" required>
-            </div>
-            <div class="form-group">
-                <label for="PesoMaximo">Peso Máximo:</label>
-                <input type="text" name="PesoMaximo" id="PesoMaximo" required>
-            </div>
-            <div class="form-group">
-                <label for="CostoPorKm">Costo Por Km:</label>
-                <input type="text" name="CostoPorKm" id="CostoPorKm" required>
-            </div>
-            <button type="submit" id="guardar-button">Guardar Camion</button>
-            <button type="button" class="cancelar" onclick="window.location.href='/web/camiones/index_camion.html';">Cancelar</button>
-        </form>
-    </div>
-
-    <div class="botonera">
-        <!-- Contenido de la botonera -->
-    </div>
+    <header class="header">
+        <div class="header-content">
+            <img src="/web/icono.jpg" alt="Logo" class="logo">
+            <h1 class="company-name">Distribuidora Los Plaplas</h1>
+        </div>
+    </header>
+    <nav class="navigation">
+        <a href="/web/index_inicio.html">Inicio</a>
+        <a href="/web/productos/index_producto.html">Productos</a>
+        <a href="/web/pedidos/index_pedido.html">Pedidos</a>
+        <a href="/web/camiones/index_camion.html" class="active">Camiones</a>
+        <a href="/web/envios/index_envio.html">Envíos</a>
+    </nav>
+    <main class="main-content">
+        <div class="formulario">
+            <h2>Nuevo Camión</h2>
+            <form action="/" method="post" id="form">
+                <div class="form-group">
+                    <label for="Patente">Patente:</label>
+                    <input type="text" name="Patente" id="Patente" required>
+                </div>
+                <div class="form-group">
+                    <label for="PesoMaximo">Peso Máximo:</label>
+                    <input type="number" name="PesoMaximo" id="PesoMaximo" required>
+                </div>
+                <div class="form-group">
+                    <label for="CostoPorKm">Costo Por Km:</label>
+                    <input type="number" name="CostoPorKm" id="CostoPorKm" step="0.01" required>
+                </div>
+                <button type="submit" id="guardar-button">Guardar Camión</button>
+                <button type="button" class="cancelar" onclick="window.location.href='/web/camiones/index_camion.html';">Cancelar</button>
+            </form>
+        </div>
+    </main>
     <script src="form.js"></script>
     <script src="/web/request.js"></script>
 </body>
-
 </html>
+
