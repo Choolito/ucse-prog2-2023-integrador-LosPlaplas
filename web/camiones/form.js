@@ -92,7 +92,7 @@ function actualizarCamion(idCamion) {
 
   function exitoCamion (response) {
     alert("Camion actualizado con exito");
-    window.location = window.location.origin + "/web/productos/index_camion.html";
+    window.location = window.location.origin + "/web/camiones/index_camion.html";
   }
 
   function errorCamion(error) {

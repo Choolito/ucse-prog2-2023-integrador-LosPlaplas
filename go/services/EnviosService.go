@@ -46,6 +46,7 @@ func NewEnviosService(enviosRepository repositories.EnviosRepositoryInterface, p
 // Se genere un envio
 // Envio pasa a estado "A despachar".
 func (es *EnviosService) CrearEnvio(envio *dto.Envio) error {
+
 	// Verificar que el camión no esté vacío
 	if envio.IDCamion == "" {
 		return fmt.Errorf("el camión no puede estar vacío")

@@ -40,13 +40,13 @@ function exitoObtenerProductos(response) {
       const row = document.createElement("tr"); //crear una fila
 
       row.innerHTML = ` 
-                    <td>${elemento.CodigoProducto}</td>
-                    <td>${elemento.Nombre}</td>
-                    <td>${elemento.TipoProducto}</td>
-                    <td>${elemento.PrecioUnitario}</td>
-                    <td>${elemento.PesoUnitario}</td>
-                    <td>${elemento.StockMinimo}</td>
-                    <td>${elemento.CantidadEnStock}</td>
+                    <td>${elemento.codigoProducto}</td>
+                    <td>${elemento.nombre}</td>
+                    <td>${elemento.tipoProducto}</td>
+                    <td>${elemento.precioUnitario}</td>
+                    <td>${elemento.pesoUnitario}</td>
+                    <td>${elemento.stockMinimo}</td>
+                    <td>${elemento.cantidadEnStock}</td>
                     <td class="acciones"> 
                     <a href="form_nuevo_producto.html?id=${elemento.ID}&tipo=EDITAR">Editar</a> |
                     <a href="index_producto.html?id=${elemento.ID}&tipo=ELIMINAR">Eliminar</a> 

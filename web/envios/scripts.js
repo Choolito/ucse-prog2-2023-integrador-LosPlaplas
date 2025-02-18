@@ -34,21 +34,19 @@ function obtenerEnvios() {
 }
 
 function exitoObtenerEnvios(response) {
-  const elementosTable = document
-    .getElementById("elementosTable")
-    .querySelector("tbody");
+  const elementosTable = document.getElementById("elementosTable").querySelector("tbody");
 
   if (response != null) {
     response.forEach((elemento) => {
       const row = document.createElement("tr");
 
-      // Busca el camión correspondiente en la lista de camiones
-      const camionInfo = listaCamiones.find((camion) => camion.ID === elemento.IDCamion);
+      // Se busca el camión correspondiente usando la propiedad "id" (minúscula) del objeto camión
+      const camionInfo = listaCamiones.find((camion) => camion.id === elemento.IDCamion);
 
       row.innerHTML = `
-        <td>${camionInfo ? camionInfo.Patente : 'No encontrado'}</td>
-        <td>${elemento.Nombre}</td>
-        <td>${elemento.TipoProducto}</td>
+        <td>${camionInfo ? camionInfo.patente : 'No encontrado'}</td>
+        <td>${elemento.Ciudad}</td>
+        <td>${elemento.Ciudad}</td>
         <td>${elemento.Estado}</td>
         <td class="acciones">
           <a href="form_parada.html?id=${elemento.ID}&tipo=PARADA">Generar Parada</a>

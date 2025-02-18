@@ -5,7 +5,7 @@ import (
 
 	//"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/clients"
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/handlers"
-	//"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/middlewares"
+	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/middlewares"
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/repositories"
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/services"
 	"github.com/gin-gonic/gin"
@@ -36,7 +36,7 @@ func mappingRoutes() {
 	//authMiddleware := middlewares.NewAuthMiddleware(authClient)
 
 	//Uso del middleware para todas las rutas del grupo
-	//router.Use(middlewares.CORSMiddleware())
+	router.Use(middlewares.CORSMiddleware())
 	//router.Use(authMiddleware.ValidateToken)
 
 	//router.Use(middlewares.CORSMiddleware())
@@ -94,13 +94,13 @@ func dependencies() {
 	pedidosRepository = repositories.NewPedidosRepository(database)
 	pedidosService = services.NewPedidosService(pedidosRepository, productoRepository)
 	pedidosHandler = handlers.NewPedidosHandler(pedidosService)
-	//Envios
-	enviosRepository = repositories.NewEnviosRepository(database)
-	enviosService = services.NewEnviosService(enviosRepository, pedidosRepository, camionRepository, productoRepository)
-	enviosHandler = handlers.NewEnviosHandler(enviosService)
 	//Camion
 	camionRepository = repositories.NewCamionRepository(database)
 	camionService = services.NewCamionService(camionRepository)
 	camionHandler = handlers.NewCamionHandler(camionService)
+	//Envios
+	enviosRepository = repositories.NewEnviosRepository(database)
+	enviosService = services.NewEnviosService(enviosRepository, pedidosRepository, camionRepository, productoRepository)
+	enviosHandler = handlers.NewEnviosHandler(enviosService)
 
 }

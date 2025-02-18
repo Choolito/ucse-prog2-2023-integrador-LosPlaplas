@@ -63,10 +63,10 @@ function exitoObtenerProductos(response) {
       const row = document.createElement("tr"); //crear una fila
 
       row.innerHTML = ` 
-                    <td>${elemento.CodigoProducto}</td>
-                    <td>${elemento.Nombre}</td>
-                    <td>${elemento.TipoProducto}</td>
-                    <td>${elemento.PrecioUnitario}</td>
+                    <td>${elemento.codigoProducto}</td>
+                    <td>${elemento.nombre}</td>
+                    <td>${elemento.tipoProducto}</td>
+                    <td>${elemento.precioUnitario}</td>
                     <td class="acciones">
                     <input type="number" name="cantidad" min="1" required>
                     </td>
@@ -116,6 +116,8 @@ function errorGuardadoPedido(error) {
   console.log(error.json());
   throw new Error("Error en la solicitud al servidor.");
 }
+
+
 
 function obtenerDatosParaPedido() {
   // Obtener la ciudad destino del formulario

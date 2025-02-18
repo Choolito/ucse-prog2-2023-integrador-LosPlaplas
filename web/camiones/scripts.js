@@ -42,9 +42,9 @@ function exitoObtenerCamiones(response) {
       const row = document.createElement("tr"); //crear una fila
 
       row.innerHTML = ` 
-                    <td>${elemento.Patente}</td>
-                    <td>${elemento.PesoMaximo}</td>
-                    <td>${elemento.CostoPorKilometro}</td>
+                    <td>${elemento.patente}</td>
+                    <td>${elemento.pesoMaximo}</td>
+                    <td>${elemento.costoPorKilometro}</td>
                     <td class="acciones"> 
                     <a href="form_nuevo_camion.html?id=${elemento.ID}&tipo=EDITAR">Editar</a> |
                     <a href="index_camion.html?id=${elemento.ID}&tipo=ELIMINAR">Eliminar</a> 
