@@ -28,11 +28,11 @@ func (c *Camion) Validate() error {
 		for _, err := range err.(validator.ValidationErrors) {
 			switch err.Field() {
 			case "Patente":
-				return fmt.Errorf("La patente del camión es obligatoria")
+				return fmt.Errorf("la patente del camión es obligatoria")
 			case "PesoMaximo":
-				return fmt.Errorf("El peso máximo es obligatorio y debe ser un número positivo")
+				return fmt.Errorf("el peso máximo es obligatorio y debe ser un número positivo")
 			case "CostoPorKilometro":
-				return fmt.Errorf("El costo por kilómetro es obligatorio y debe ser un número positivo")
+				return fmt.Errorf("el costo por kilómetro es obligatorio y debe ser un número positivo")
 			}
 		}
 	}

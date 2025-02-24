@@ -235,3 +235,29 @@ button.cancelar:hover {
   background-color: #c0392b;
 }
 
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.page-header h2 {
+  margin: 0;
+}
+
+.volver-button {
+  background-color: #3498db;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease;
+}
+
+.volver-button:hover {
+  background-color: #2980b9;
+}

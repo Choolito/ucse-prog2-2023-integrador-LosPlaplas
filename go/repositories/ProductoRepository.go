@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/model"
@@ -14,13 +15,12 @@ import (
 type ProductoRepositoryInterface interface {
 	//metodos
 	CrearProducto(producto model.Producto) (*mongo.InsertOneResult, error)
+	CrearProductos(productos []model.Producto) (*mongo.InsertManyResult, error)
 	ObtenerProductos() ([]*model.Producto, error)
 	ObtenerProductoPorID(id string) (*model.Producto, error)
 	ActualizarProducto(id string, producto model.Producto) (*mongo.UpdateResult, error)
-	EliminarProducto(id string) (*mongo.DeleteResult, error)
-
+	EliminarProducto(id string) error
 	DescontarStock(id string, cantidad int) (*mongo.UpdateResult, error)
-
 	ObtenerListaConStockMinimo() ([]*model.Producto, error)
 }
 
@@ -44,12 +44,31 @@ func (pr *ProductoRepository) CrearProducto(producto model.Producto) (*mongo.Ins
 	return resultado, err
 }
 
+// Método para insertar múltiples productos
+func (pr *ProductoRepository) CrearProductos(productos []model.Producto) (*mongo.InsertManyResult, error) {
+	collection := pr.db.GetClient().Database("LosPlaplas").Collection("productos")
+
+	var documentos []interface{}
+	for i := range productos {
+		productos[i].FechaCreacion = time.Now()
+		productos[i].FechaActualizacion = time.Now()
+		documentos = append(documentos, productos[i])
+	}
+
+	resultado, err := collection.InsertMany(context.TODO(), documentos)
+	return resultado, err
+}
+
 func (pr *ProductoRepository) ObtenerProductos() ([]*model.Producto, error) {
 	collection := pr.db.GetClient().Database("LosPlaplas").Collection("productos")
-	filtroDB := bson.M{}
+
+	// Agregar filtro para traer solo productos con eliminado: false
+	filtroDB := bson.M{"eliminado": false}
 
 	cursor, err := collection.Find(context.TODO(), filtroDB)
-
+	if err != nil {
+		return nil, err
+	}
 	defer cursor.Close(context.Background())
 
 	var productos []*model.Producto
@@ -61,7 +80,9 @@ func (pr *ProductoRepository) ObtenerProductos() ([]*model.Producto, error) {
 		}
 		productos = append(productos, &producto)
 	}
-	return productos, err
+
+	// Devolver la lista de productos
+	return productos, nil
 }
 
 func (pr *ProductoRepository) ObtenerProductoPorID(id string) (*model.Producto, error) {
@@ -88,8 +109,12 @@ func (pr *ProductoRepository) ActualizarProducto(id string, producto model.Produ
 
 	update := bson.M{
 		"$set": bson.M{
+			"codigoProducto":     producto.CodigoProducto,
 			"nombre":             producto.Nombre,
 			"precioUnitario":     producto.PrecioUnitario,
+			"pesoUnitario":       producto.PesoUnitario,
+			"stockMinimo":        producto.StockMinimo,
+			"cantidadEnStock":    producto.CantidadEnStock,
 			"fechaActualizacion": time.Now(),
 		},
 	}
@@ -97,18 +122,25 @@ func (pr *ProductoRepository) ActualizarProducto(id string, producto model.Produ
 	return resultado, err
 }
 
-func (repo *ProductoRepository) EliminarProducto(id string) (*mongo.DeleteResult, error) {
+func (repo *ProductoRepository) EliminarProducto(id string) error {
 	collection := repo.db.GetClient().Database("LosPlaplas").Collection("productos")
 	objectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	result, err := collection.DeleteOne(context.Background(), bson.M{"_id": objectID})
+	filtro := bson.M{"_id": objectID}
+	actualizacion := bson.M{"$set": bson.M{"eliminado": true}}
+
+	resultado, err := collection.UpdateOne(context.Background(), filtro, actualizacion)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return result, nil
+	if resultado.ModifiedCount == 0 {
+		return fmt.Errorf("no se pudo marcar como eliminado el producto con el id: %s", id)
+	}
+
+	return nil
 }
 
 func (pr *ProductoRepository) DescontarStock(id string, cantidad int) (*mongo.UpdateResult, error) {

@@ -43,6 +43,34 @@ func (handler *ProductoHandler) CrearProducto(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"mensaje": "Producto creado exitosamente"})
 }
 
+func (handler *ProductoHandler) CrearProductos(c *gin.Context) {
+	var productos []dto.Producto
+
+	if err := c.ShouldBindJSON(&productos); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Datos inválidos"})
+		return
+	}
+
+	for _, producto := range productos {
+		if err := producto.Validate(); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+	}
+
+	var productosPtr []*dto.Producto
+	for i := range productos {
+		productosPtr = append(productosPtr, &productos[i])
+	}
+	err := handler.productoService.CrearProductos(productosPtr)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"mensaje": "Productos creados exitosamente"})
+}
+
 func (handler *ProductoHandler) ObtenerProductos(c *gin.Context) {
 
 	resultado, err := handler.productoService.ObtenerProductos()
@@ -86,8 +114,10 @@ func (handler *ProductoHandler) EliminarProducto(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusNoContent, gin.H{"mensaje": "Producto eliminado exitosamente"})
+	// En lugar de 204 No Content, devuelve 200 con un mensaje
+	c.JSON(http.StatusOK, gin.H{"mensaje": "Producto eliminado exitosamente"})
 }
+
 func (handler *ProductoHandler) ObtenerListaConStockMinimo(c *gin.Context) {
 	// Obtener la lista de productos con stock mínimo
 	resultado, err := handler.productoService.ObtenerListaConStockMinimo()

@@ -71,7 +71,7 @@ function exitoObtenerProductos(response) {
                     <input type="number" name="cantidad" min="1" required>
                     </td>
                     <td>
-                    <input type="checkbox" name="seleccionar" value="${elemento.ID}" required>
+                    <input type="checkbox" name="seleccionar" value="${elemento.id}" required>
                     </td>
                     `;
       elementosTable.appendChild(row);
@@ -85,31 +85,43 @@ function errorObtenerProductos(error) {
   throw new Error("Error en la solicitud al servidor.");
 }
 
-function guardarPedido() 
-{
+function guardarPedido(event) {
+  event.preventDefault(); // Evita que el formulario se recargue automáticamente
+
   if (confirm("¿Estás seguro de que deseas guardar este pedido?")) {
     urlConFiltro = `http://localhost:8080/pedidos`;
-    data = obtenerDatosParaPedido()
-    debugger;
+    data = obtenerDatosParaPedido();
+
+    console.log("Enviando solicitud a:", urlConFiltro);
+    console.log("Datos enviados:", JSON.stringify(data, null, 2));
+
     makeRequest(
-      `${urlConFiltro}`,
+      urlConFiltro,
       Method.POST,
       data,
       ContentType.JSON,
       CallType.PRIVATE,
-      exitoGuardadoPedido,
-      errorGuardadoPedido
+      (response) => {
+        console.log("Respuesta del servidor:", response);
+        alert("Pedido guardado correctamente.");
+        window.location.href = "/web/pedidos/index_pedido.html"; // Redirigir al index
+      },
+      (error) => {
+        alert("Error en la solicitud al servidor.");
+        console.log(error);
+      }
     );
-  } else {
-    window.location = '/web/pedidos/index_pedido.html';
   }
 }
 
+
+
 function exitoGuardadoPedido(response) {
-  debugger;
+  console.log("Respuesta del servidor:", response);
   alert("Pedido guardado correctamente.");
-  window.location.href = windw.location.origin+"/web/pedidos/index_pedido.html";
+  window.location.href = "/web/pedidos/index_pedido.html";
 }
+
 
 function errorGuardadoPedido(error) {
   alert("Error en la solicitud al servidor.");

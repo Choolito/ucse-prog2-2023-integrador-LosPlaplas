@@ -15,6 +15,7 @@ type Producto struct {
 	PesoUnitario       int                `bson:"pesoUnitario"`
 	StockMinimo        int                `bson:"stockMinimo"`
 	CantidadEnStock    int                `bson:"cantidadEnStock"`
+	Eliminado          bool               `bson:"eliminado"`
 	FechaCreacion      time.Time          `bson:"fechaCreacion"`
 	FechaActualizacion time.Time          `bson:"fechaActualizacion"`
 }
