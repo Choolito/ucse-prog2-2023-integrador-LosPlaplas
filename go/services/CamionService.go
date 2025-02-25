@@ -81,13 +81,11 @@ func (cs *CamionService) EliminarCamion(id string) error {
 		return fmt.Errorf("no se encontró el camión con el id: %s", id)
 	}
 
-	// Eliminar el camión
-	eliminado, err := cs.camionRepository.EliminarCamion(id)
+	// Marcar el camión como eliminado
+	err = cs.camionRepository.EliminarCamion(id)
 	if err != nil {
 		return err
 	}
-	if eliminado.DeletedCount == 0 {
-		return fmt.Errorf("no se pudo eliminar el camión con el id: %s", id)
-	}
+
 	return nil
 }

@@ -92,8 +92,9 @@ function aceptarPedido(id) {
 }
 
 function exitoAceptarPedido(response) {
-  window.location = windw.location.origin + "/web/pedidos/index_pedido.html";
+  window.location.href = window.location.origin + "/web/pedidos/index_pedido.html";
 }
+
 
 function errorAceptarPedido(error) {
   alert("Error en la solicitud al servidor.");
@@ -119,7 +120,7 @@ function cancelarPedido(id) {
 }
 
 function exitoCancelarPedido(response) {
-  window.location = windw.location,origin + "/web/pedidos/index_pedido.html";
+  window.location = window.location.origin + "/web/pedidos/index_pedido.html";
 }
 
 function errorCancelarPedido(error) {

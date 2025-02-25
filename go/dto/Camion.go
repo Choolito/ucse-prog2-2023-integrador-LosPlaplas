@@ -14,6 +14,7 @@ type Camion struct {
 	Patente            string    `json:"patente" validate:"required"`
 	PesoMaximo         int       `json:"pesoMaximo" validate:"required,gt=0"`
 	CostoPorKilometro  int       `json:"costoPorKilometro" validate:"required,gt=0"`
+	Eliminado          bool      `json:"eliminado"`
 	FechaCreacion      time.Time `json:"fechaCreacion"`
 	FechaActualizacion time.Time `json:"fechaActualizacion"`
 }
@@ -45,6 +46,7 @@ func NewCamion(camion model.Camion) *Camion {
 		Patente:            camion.Patente,
 		PesoMaximo:         camion.PesoMaximo,
 		CostoPorKilometro:  camion.CostoPorKilometro,
+		Eliminado:          camion.Eliminado,
 		FechaCreacion:      camion.FechaCreacion,
 		FechaActualizacion: camion.FechaActualizacion,
 	}
@@ -56,6 +58,7 @@ func (camion Camion) GetModel() model.Camion {
 		Patente:            camion.Patente,
 		PesoMaximo:         camion.PesoMaximo,
 		CostoPorKilometro:  camion.CostoPorKilometro,
+		Eliminado:          camion.Eliminado,
 		FechaCreacion:      camion.FechaCreacion,
 		FechaActualizacion: camion.FechaActualizacion,
 	}

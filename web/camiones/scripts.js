@@ -46,8 +46,8 @@ function exitoObtenerCamiones(response) {
                     <td>${elemento.pesoMaximo}</td>
                     <td>${elemento.costoPorKilometro}</td>
                     <td class="acciones"> 
-                    <a href="form_nuevo_camion.html?id=${elemento.ID}&tipo=EDITAR">Editar</a> |
-                    <a href="index_camion.html?id=${elemento.ID}&tipo=ELIMINAR">Eliminar</a> 
+                    <a href="form_nuevo_camion.html?id=${elemento.id}&tipo=EDITAR">Editar</a> |
+                    <a href="index_camion.html?id=${elemento.id}&tipo=ELIMINAR">Eliminar</a> 
                     </td>
                     `;
 
@@ -75,9 +75,10 @@ function eliminarCamion(idCamion) {
 }
 
 function exitoCamion(response) {
-  alert("Camion eliminado con exito");
-  location.reload();
+  alert("Camión eliminado con éxito");
+  window.location.href = "index_camion.html"; // Redirige sin los parámetros de eliminación
 }
+
 
 function errorCamion(error) {
   alert("Error en la solicitud al servidor.");

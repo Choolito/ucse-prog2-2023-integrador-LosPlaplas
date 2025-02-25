@@ -68,13 +68,14 @@ function guardarCamion() {
     data,
     ContentType.JSON,
     CallType.PRIVATE,
-    exitoCamion,
-    errorCamion
+    exitoCrearCamion,
+    errorCrearCamion
   );
 }
 
 function actualizarCamion(idCamion) {
   const data = {
+    PesoMaximo: parseInt(document.getElementById("PesoMaximo").value),
     CostoPorKilometro: parseInt(document.getElementById("CostoPorKm").value),
   };
   debugger;
@@ -84,23 +85,33 @@ function actualizarCamion(idCamion) {
     data,
     ContentType.JSON,
     CallType.PRIVATE,
-    exitoCamion,
-    errorCamion
+    exitoActualizarCamion,
+    errorActualizarCamion
   );
 
   }
 
-  function exitoCamion (response) {
-    alert("Camion actualizado con exito");
+  function exitoCrearCamion (response) {
+    alert("Camion creado con exito");
     window.location = window.location.origin + "/web/camiones/index_camion.html";
   }
 
-  function errorCamion(error) {
+  function errorCrearCamion(error) {
     alert("Error en la solicitud al servidor.");
     console.log(error.json());
     throw new Error("Error en la solicitud al servidor.");
   }
 
+  function exitoActualizarCamion (response) {
+    alert("Camion actualizado con exito");
+    window.location = window.location.origin + "/web/camiones/index_camion.html";
+  }
+
+  function errorActualizarCamion(error) {
+    alert("Error en la solicitud al servidor.");
+    console.log(error.json());
+    throw new Error("Error en la solicitud al servidor.");
+  }
 function obtenerCamionParaEdicion(idCamion) {
   debugger;
   makeRequest(
@@ -115,14 +126,31 @@ function obtenerCamionParaEdicion(idCamion) {
 }
 
 function exitoObtenerCamionEdicion(response) {
-  document.getElementById("Patente").value = response.Patente;
-  document.getElementById("PesoMaximo").value = response.PesoMaximo;
-  document.getElementById("CostoPorKm").value = response.CostoPorKilometro;
+  console.log("Datos recibidos del backend:", response);
 
-  //Deshabilitar
-  document.getElementById("Patente").disabled = true;
-  document.getElementById("PesoMaximo").disabled = true;
+  const patenteInput = document.getElementById("Patente");
+  const pesoMaximoInput = document.getElementById("PesoMaximo");
+  const costoPorKilometroInput = document.getElementById("CostoPorKm");
+
+  if (!patenteInput || !pesoMaximoInput || !costoPorKilometroInput) {
+      console.error("❌ Error: No se encontraron los elementos en el formulario.");
+      return;
+  }
+
+  // Asignar valores
+  patenteInput.value = response.patente || "";
+  pesoMaximoInput.value = response.pesoMaximo || 0;
+  costoPorKilometroInput.value = response.costoPorKilometro || 0;
+
+  // Deshabilitar el input de la patente si estamos editando
+  const urlParams = new URLSearchParams(window.location.search);
+  const operacion = urlParams.get("tipo");
+  if (operacion === "EDITAR") {
+      patenteInput.setAttribute("disabled", "true");
+  }
 }
+
+
 
 function errorObtenerCamionEdicion(error) {
   alert("Error en la solicitud al servidor.");
