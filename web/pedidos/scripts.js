@@ -128,3 +128,4 @@ function errorCancelarPedido(error) {
   console.log(error.json());
   throw new Error("Error en la solicitud al servidor.");
 }
+
