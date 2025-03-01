@@ -45,7 +45,7 @@ func mappingRoutes() {
 	router.POST("/productos/masivos", productoHandler.CrearProductos)
 	router.GET("/productos", productoHandler.ObtenerProductos)
 	router.GET("/productos/:id", productoHandler.ObtenerProductoPorID)
-	router.GET("/productos/stockminimo", productoHandler.ObtenerListaConStockMinimo) //lista stock minimo y ?categoria= filtro
+	router.POST("/productos/stockminimo", productoHandler.ObtenerListaConStockMinimo) //lista stock minimo y ?categoria= filtro
 	router.PUT("/productos/:id", productoHandler.ActualizarProducto)
 	router.DELETE("/productos/:id", productoHandler.EliminarProducto)
 

@@ -85,9 +85,10 @@ async function makeRequest(
       responseBody = await response.json();
     }catch{}
 
-    if ("access_token" in responseBody) {
+    if (responseBody && typeof responseBody === "object" && "access_token" in responseBody) {
       localStorage.setItem("authToken", responseBody.access_token);
     }
+    
     
     if (response.ok) {
       console.info(

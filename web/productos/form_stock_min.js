@@ -6,152 +6,146 @@ customHeaders.append("Connection", "keep-alive");
 
 const baseUrl = "http://localhost:8080/productos";
 
-document.addEventListener("DOMContentLoaded", function (event) {
-    // Cargar productos iniciales con stock mínimo
-    obtenerProductosStockMenor();
+const TIPOS_PRODUCTO = {
+    GOLOSINAS: "Golosinas",
+    BEBIDAS: "Bebidas",
+    CIGARRILLOS: "Cigarrillos",
+    COMESTIBLES: "Comestibles",
+    HIGIENE_Y_SALUD: "Higiene y Salud",
+    SIN_FILTRO: "" // Para traer todos los productos
+};
+
+document.addEventListener("DOMContentLoaded", function () {
+    obtenerProductosStockMinimo(TIPOS_PRODUCTO.SIN_FILTRO);
 });
 
-function obtenerProductosStockMenor() {
-    console.log("Obteniendo productos con stock mínimo...");
+let productosStockMinimo = []; // Variable global
+
+function obtenerProductosStockMinimo(tipoProducto = "") {
+    let tipoProductoCorregido = Object.values(TIPOS_PRODUCTO).includes(tipoProducto) ? tipoProducto : "";
+
+    console.log("📌 TipoProducto corregido:", tipoProductoCorregido);
+
+    const bodyData = { TipoProducto: tipoProductoCorregido };
+
     makeRequest(
         `${baseUrl}/stockminimo`,
-        Method.GET,
-        null,
+        Method.POST,
+        bodyData,
         ContentType.JSON,
-        CallType.PRIVATE,
-        exitoObtenerProductos,
+        CallType.PUBLIC,
+        (respuesta) => {
+            console.log("✅ Productos recibidos:", respuesta);
+            if (!respuesta || respuesta.length === 0) {
+                mostrarMensaje("No hay productos en esta categoría.");
+                return;
+            }
+            productosStockMinimo = respuesta;
+            mostrarProductos(productosStockMinimo);
+        },
         errorObtenerProductos
     );
 }
 
-function exitoObtenerProductos(response) {
-    console.log("Respuesta del servidor:", response);
-    const elementosTable = document
-        .getElementById("elementosTable")
-        .querySelector("tbody");
-
-    // Limpiar la tabla antes de agregar nuevos datos
-    elementosTable.innerHTML = '';
-
-    // Llenar la tabla con los datos obtenidos
-    if (response != null && response.length > 0) {
-        response.forEach((elemento) => {
-            // Verificar si el stock actual es menor o igual al stock mínimo
-            if (elemento.cantidadEnStock <= elemento.stockMinimo) {
-                const row = document.createElement("tr");
-                row.innerHTML = ` 
-                    <td>${elemento.codigoProducto || ''}</td>
-                    <td>${elemento.nombre || ''}</td>
-                    <td>${elemento.tipoProducto || ''}</td>
-                    <td>${elemento.precioUnitario || 0}</td>
-                    <td>${elemento.pesoUnitario || 0}</td>
-                    <td>${elemento.stockMinimo || 0}</td>
-                    <td>${elemento.cantidadEnStock || 0}</td>
-                `;
-                elementosTable.appendChild(row);
-            }
-        });
-
-        // Si después de filtrar no hay productos, mostrar mensaje
-        if (elementosTable.children.length === 0) {
-            mostrarMensajeNoProductos(elementosTable);
-        }
-    } else {
-        mostrarMensajeNoProductos(elementosTable);
-    }
-}
-
-function mostrarMensajeNoProductos(elementosTable) {
-    const row = document.createElement("tr");
-    row.innerHTML = '<td colspan="7" style="text-align: center;">No se encontraron productos con stock mínimo</td>';
-    elementosTable.appendChild(row);
-}
-
-function errorObtenerProductos(error) {
-    console.error("Error al obtener productos:", error);
-    alert("Error en la solicitud al servidor.");
-}
-
 function filtrarProductos() {
-    const filtroSelect = document.getElementById("filtroSelect");
-    const filtro = filtroSelect.value;
-
-    console.log("Aplicando filtro:", filtro);
-
-    // Si hay un filtro seleccionado, usar el endpoint de filtrado
-    if (filtro) {
-        makeRequest(
-            `${baseUrl}/stockminimo/${filtro}`,
-            Method.GET,
-            null,
-            ContentType.JSON,
-            CallType.PRIVATE,
-            exitoObtenerProductos,
-            errorObtenerProductos
-        );
-    } else {
-        // Si no hay filtro, obtener todos los productos con stock mínimo
-        obtenerProductosStockMenor();
-    }
+    let filtroSelect = document.getElementById("filtroSelect").value.trim();
+    let filtroCorregido = TIPOS_PRODUCTO[filtroSelect.toUpperCase().replace(/\s+/g, "_")] || "";
+    console.log("Aplicando filtro corregido:", filtroCorregido);
+    obtenerProductosStockMinimo(filtroCorregido);
 }
 
 function quitarFiltro() {
     console.log("Quitando filtros...");
-    // Restablecer el select
-    const filtroSelect = document.getElementById("filtroSelect");
-    filtroSelect.value = "";
-
-    // Volver a cargar los productos con stock mínimo
-    obtenerProductosStockMenor();
+    document.getElementById("filtroSelect").value = "";
+    obtenerProductosStockMinimo(TIPOS_PRODUCTO.SIN_FILTRO);
 }
 
-// Agregar los enums necesarios si no están definidos en request.js
-const Method = {
-    GET: "GET",
-    POST: "POST",
-    PUT: "PUT",
-    DELETE: "DELETE"
-};
+function mostrarMensaje(mensaje) {
+    const mensajeContainer = document.getElementById("mensaje-container");
+    const tabla = document.getElementById("elementosTable");
 
-const ContentType = {
-    JSON: "application/json",
-    FORM_URL_ENCODED: "application/x-www-form-urlencoded"
-};
+    if (!mensajeContainer) {
+        console.error("Elemento 'mensaje-container' no encontrado en el DOM.");
+        return;
+    }
 
-const CallType = {
-    PRIVATE: "PRIVATE",
-    PUBLIC: "PUBLIC"
-};
+    mensajeContainer.innerHTML = `<p>${mensaje}</p>`;
+    mensajeContainer.style.display = "block";
+    if (tabla) tabla.style.display = "none";
+}
 
-// Función auxiliar para hacer las peticiones si no está definida en request.js
-async function makeRequest(url, method, data, contentType, callType, onSuccess, onError) {
-    try {
-        console.log("Realizando petición a:", url);
-        const options = {
-            method: method,
-            headers: {
-                "Content-Type": contentType,
-                ...customHeaders
-            },
-            body: data ? JSON.stringify(data) : null
-        };
+function mostrarProductos(lista) {
+    console.log("Mostrando productos:", lista);
+    const elementosTable = document.getElementById("elementosTable");
+    const tbody = elementosTable ? elementosTable.querySelector("tbody") : null;
+    const mensajeContainer = document.getElementById("mensaje-container");
 
-        const response = await fetch(url, options);
+    if (!tbody) {
+        console.error("No se encontró el tbody de la tabla.");
+        return;
+    }
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+    tbody.innerHTML = "";
+
+    if (!lista || lista.length === 0) {
+        mostrarMensaje("No se encontraron productos con stock mínimo");
+        return;
+    }
+
+    lista.forEach((elemento) => {
+        if (elemento.cantidadEnStock <= elemento.stockMinimo) {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${elemento.codigoProducto || ""}</td>
+                <td>${elemento.nombre || ""}</td>
+                <td>${elemento.tipoProducto || ""}</td>
+                <td>${elemento.precioUnitario || 0}</td>
+                <td>${elemento.pesoUnitario || 0}</td>
+                <td>${elemento.stockMinimo || 0}</td>
+                <td>${elemento.cantidadEnStock || 0}</td>
+            `;
+            tbody.appendChild(row);
         }
+    });
 
-        const responseData = await response.json();
-        console.log("Respuesta exitosa:", responseData);
-        onSuccess(responseData);
-    } catch (error) {
-        console.error("Error en la petición:", error);
-        onError(error);
+    if (tbody.children.length === 0) {
+        mostrarMensaje("No se encontraron productos con stock mínimo");
+    } else {
+        if (elementosTable) elementosTable.style.display = "table";
+        if (mensajeContainer) mensajeContainer.style.display = "none";
     }
 }
 
+function errorObtenerProductos(error) {
+    console.error("Error al obtener productos:", error);
+
+    if (error && typeof error === "string" && error.includes("access_token")) {
+        alert("Error de autenticación: No tienes acceso. Verifica tu sesión.");
+    } else {
+        alert("Error en la solicitud al servidor.");
+    }
+
+    mostrarMensaje("Error al cargar los productos. Intenta nuevamente.");
+}
+
 function volverAProductos() {
-  // Navegar a la página de productos
-  window.location.href = '/web/productos/index_producto.html';
+    window.location.href = "/web/productos/index_producto.html";
+}
+
+function actualizarInterfazProductos(productos) {
+    const tabla = document.getElementById("elementosTable");
+    const mensaje = document.getElementById("mensaje-container");
+
+    if (!tabla || !mensaje) {
+        console.error("No se encontraron los elementos en el DOM.");
+        return;
+    }
+
+    if (productos.length === 0) {
+        tabla.style.display = "none";
+        mensaje.style.display = "block";
+    } else {
+        tabla.style.display = "table";
+        mensaje.style.display = "none";
+    }
 }
