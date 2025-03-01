@@ -137,3 +137,22 @@ func (enviosHandler *EnviosHandler) CambiarEstadoEnvio(c *gin.Context) {
 	//logging.LoggearResultadoYResponder(c, "nombre del handler", "Que metodo", true, &user) Lo mismo aca abajo
 
 }
+
+func (enviosHandler *EnviosHandler) ObtenerEnviosFiltrados(c *gin.Context) {
+	var filtro utils.FiltroEnvio
+
+	// Bind JSON a struct FiltroEnvio
+	if err := c.ShouldBindJSON(&filtro); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Formato de entrada inválido"})
+		return
+	}
+
+	// Llamar al service con los filtros
+	envios, err := enviosHandler.enviosService.ObtenerEnviosFiltrados(&filtro)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, envios)
+}

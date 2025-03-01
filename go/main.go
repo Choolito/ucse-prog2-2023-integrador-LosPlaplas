@@ -70,6 +70,7 @@ func mappingRoutes() {
 	//Envios
 	router.POST("/envios", enviosHandler.CrearEnvio)
 	router.GET("/envios", enviosHandler.ObtenerEnvio)
+	router.POST("/envios/filtrado", enviosHandler.ObtenerEnviosFiltrados)
 	router.PUT("/envios/iniciar/:id", enviosHandler.IniciarViajeEnvio)
 	router.PUT("/envios/parada/:id", enviosHandler.GenerarParadaEnvio)
 	router.PUT("/envios/finalizar/:id", enviosHandler.FinalizarViajeEnvio)

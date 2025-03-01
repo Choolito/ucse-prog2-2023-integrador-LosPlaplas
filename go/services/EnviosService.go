@@ -21,6 +21,7 @@ type EnviosInterface interface {
 	ObtenerEnvio() ([]*dto.Envio, error)
 	CambiarEstadoEnvio(envio *dto.Envio, user *dto.User) (bool, error)
 	ObtenerPedidosFiltrados(filtro *utils.FiltroPedido) ([]*dto.Pedidos, error)
+	ObtenerEnviosFiltrados(filtro *utils.FiltroEnvio) ([]*dto.Envio, error)
 }
 
 type EnviosService struct {
@@ -242,4 +243,18 @@ func (envioService *EnviosService) ObtenerPedidosFiltrados(filtro *utils.FiltroP
 		pedidos = append(pedidos, pedido)
 	}
 	return pedidos, nil
+}
+
+func (enviosService *EnviosService) ObtenerEnviosFiltrados(filtro *utils.FiltroEnvio) ([]*dto.Envio, error) {
+	enviosDB, err := enviosService.enviosRepository.ObtenerEnviosFiltrados(filtro)
+	if err != nil {
+		return nil, err
+	}
+
+	var envios []*dto.Envio
+	for _, envioDB := range enviosDB {
+		envios = append(envios, dto.NewEnvio(*envioDB))
+	}
+
+	return envios, nil
 }
