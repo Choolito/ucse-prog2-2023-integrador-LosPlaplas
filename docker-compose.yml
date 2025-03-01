@@ -1,6 +1,5 @@
-version: '3'
-
 services:
+
   mongodb:
     image: mongo:latest
     container_name: mongodb-container
@@ -13,19 +12,21 @@ services:
 
   go-app:
     build:
-      context: ./
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: go/Dockerfile
     container_name: go-app-container
     depends_on:
-      - mongodb
+      - mongodb      
     ports:
       - "8080:8080"
     networks:
       - app-network
+    volumes:
+      - ./web:/app/web/html  # Monta el frontend correctamente
 
   web-app:
     build:
-      context: ./web
+      context: ./web   
       dockerfile: Dockerfile
     container_name: web-app-container
     ports:
@@ -33,7 +34,7 @@ services:
     networks:
       - app-network
     depends_on:
-      - go-app
+      - go-app        
 
 networks:
   app-network:
