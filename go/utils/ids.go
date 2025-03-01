@@ -7,6 +7,11 @@ func GetObjectIDFromStringID(id string) primitive.ObjectID {
 	return objID
 }
 
+func GetObjectIDFromStringIDErr(id string) (primitive.ObjectID, error) {
+	objID, err := primitive.ObjectIDFromHex(id)
+	return objID, err
+}
+
 func GetStringIDFromObjectID(id primitive.ObjectID) string {
 	return id.Hex()
 }

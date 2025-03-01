@@ -145,6 +145,7 @@ function renderizarTablaEnvios(response) {
       const kilometrosRecorridos = calcularKilometrosRecorridos(elemento.Paradas)
 
       row.innerHTML = `
+        <td>${elemento.ID}</td>
         <td>${camionInfo ? camionInfo.patente : "No encontrado"}</td>
         <td>${ciudadActual}</td>
         <td>${ciudadDestino}</td>

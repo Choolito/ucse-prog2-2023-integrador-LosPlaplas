@@ -150,3 +150,19 @@ func (ph *PedidosHandler) ActualizarPedidoAceptado(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"mensaje": "Pedido actualizado a aceptado exitosamente"})
 }
+
+func (h *PedidosHandler) ObtenerPedidosFiltrados(c *gin.Context) {
+	var filtro utils.FiltroPedido
+	if err := c.ShouldBindJSON(&filtro); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Datos de filtro inválidos"})
+		return
+	}
+
+	pedidos, err := h.pedidosService.ObtenerPedidosFiltrados(&filtro)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al obtener pedidos"})
+		return
+	}
+
+	c.JSON(http.StatusOK, pedidos)
+}
