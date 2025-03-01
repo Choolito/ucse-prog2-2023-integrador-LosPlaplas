@@ -25,7 +25,7 @@ type EnviosRepositoryInterface interface {
 
 	IniciarViajeEnvio(id string) (*mongo.UpdateResult, error)
 	GenerarParadaEnvio(id string, parada model.Parada) (*mongo.UpdateResult, error)
-	FinalizarViajeEnvio(id string) (*mongo.UpdateResult, error)
+	FinalizarViajeEnvio(id string, parada model.Parada) (*mongo.UpdateResult, error)
 
 	ObtenerPedidosFiltro(codigoEnvio string, estado string, fechaInicio time.Time, fechaFinal time.Time) ([]model.Pedidos, error)
 }
@@ -116,14 +116,7 @@ func (enviosRepository *EnviosRepository) ObtenerEnvioPorID(id string) (model.En
 	return envio, err
 }
 
-func (enviosRepository *EnviosRepository) FinalizarViajeEnvio(id string) (*mongo.UpdateResult, error) {
-	// collection := EnviosRepository.db.GetClient().Database("LosPlaplas").Collection("envios")
-	// objectID := utils.GetObjectIDFromStringID(id)
-	// filter := bson.M{"_id": objectID, "estado": "En ruta"}
-	// update := bson.M{"$set": bson.M{"estado": "Despachado", "fechaActualizacion": time.Now()}}
-	// resultado, err := collection.UpdateOne(context.Background(), filter, update)
-	// return resultado, err
-
+func (enviosRepository *EnviosRepository) FinalizarViajeEnvio(id string, parada model.Parada) (*mongo.UpdateResult, error) {
 	collection := enviosRepository.db.GetClient().Database("LosPlaplas").Collection("envios")
 	objectID := utils.GetObjectIDFromStringID(id)
 	filter := bson.M{"_id": objectID, "estado": "En ruta"}
@@ -131,16 +124,28 @@ func (enviosRepository *EnviosRepository) FinalizarViajeEnvio(id string) (*mongo
 	// Verificar si el envío está en estado "En ruta" antes de finalizarlo.
 	count, err := collection.CountDocuments(context.Background(), filter)
 	if err != nil {
-		return nil, err // Manejo del error si hay un problema en la consulta.
+		return nil, err
 	}
 
 	if count == 0 {
-		return nil, errors.New("El envío no está en estado 'En ruta', no se puede finalizar") // Retorna un error si el estado no es el adecuado.
+		return nil, errors.New("el envío no está en estado 'En ruta', no se puede finalizar")
 	}
 
+	// 🔹 Primero, guardar la última parada en la base de datos
+	_, err = enviosRepository.GenerarParadaEnvio(id, parada)
+	if err != nil {
+		log.Printf("Error al generar parada para el envío %s: %v", id, err)
+		return nil, err
+	}
+
+	// 🔹 Luego, actualizar el estado del envío a "Despachado"
 	update := bson.M{"$set": bson.M{"estado": "Despachado", "fechaActualizacion": time.Now()}}
 	resultado, err := collection.UpdateOne(context.Background(), filter, update)
-	return resultado, err
+	if err != nil {
+		return nil, err
+	}
+
+	return resultado, nil
 }
 
 func (EnviosRepository *EnviosRepository) ActualizarEnvio(envio *model.Envio) error {
