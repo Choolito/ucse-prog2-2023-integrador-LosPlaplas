@@ -4,16 +4,19 @@ import (
 	"fmt"
 
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/dto"
+	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/model"
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/repositories"
+	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/utils"
 )
 
 type ProductoInterface interface {
-	//metodos
+	// Métodos
 	CrearProducto(producto *dto.Producto) error
+	CrearProductos(productos []*dto.Producto) error
 	ObtenerProductos() ([]*dto.Producto, error)
 	ActualizarProducto(id string, producto *dto.Producto) error
 	EliminarProducto(id string) error
-	ObtenerListaConStockMinimo() ([]*dto.Producto, error)
+	ObtenerListaConStockMinimo(filtro utils.FiltroProducto) ([]*dto.Producto, error)
 	ObtenerProductoPorID(id string) (*dto.Producto, error)
 }
 
@@ -30,6 +33,16 @@ func NewProductoService(productoRepository repositories.ProductoRepositoryInterf
 func (ps *ProductoService) CrearProducto(producto *dto.Producto) error {
 	_, err := ps.productoRepository.CrearProducto(producto.GetModel())
 	return err
+}
+
+func (ps *ProductoService) CrearProductos(productos []*dto.Producto) error {
+	for _, producto := range productos {
+		_, err := ps.productoRepository.CrearProductos([]model.Producto{producto.GetModel()})
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (ps *ProductoService) ObtenerProductos() ([]*dto.Producto, error) {
@@ -56,19 +69,17 @@ func (ps *ProductoService) EliminarProducto(id string) error {
 		return fmt.Errorf("no se encontró el producto con el id: %s", id)
 	}
 
-	// Eliminar el producto
-	eliminado, err := ps.productoRepository.EliminarProducto(id)
+	// "Eliminar" el producto (marcar como eliminado)
+	err = ps.productoRepository.EliminarProducto(id)
 	if err != nil {
 		return err
 	}
-	if eliminado.DeletedCount == 0 {
-		return fmt.Errorf("no se pudo eliminar el producto con el id: %s", id)
-	}
 	return nil
 }
-func (service *ProductoService) ObtenerListaConStockMinimo() ([]*dto.Producto, error) {
-	// Lógica para obtener productos con stock mínimo
-	productos, err := service.productoRepository.ObtenerListaConStockMinimo()
+
+func (service *ProductoService) ObtenerListaConStockMinimo(filtro utils.FiltroProducto) ([]*dto.Producto, error) {
+	// Lógica para obtener productos con stock mínimo, con filtro
+	productos, err := service.productoRepository.ObtenerListaConStockMinimo(filtro)
 	if err != nil {
 		return nil, err
 	}

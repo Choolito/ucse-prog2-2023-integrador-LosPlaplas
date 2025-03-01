@@ -6,6 +6,7 @@ import (
 
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/dto"
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/services"
+	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -41,6 +42,34 @@ func (handler *ProductoHandler) CrearProducto(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{"mensaje": "Producto creado exitosamente"})
+}
+
+func (handler *ProductoHandler) CrearProductos(c *gin.Context) {
+	var productos []dto.Producto
+
+	if err := c.ShouldBindJSON(&productos); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Datos inválidos"})
+		return
+	}
+
+	for _, producto := range productos {
+		if err := producto.Validate(); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+	}
+
+	var productosPtr []*dto.Producto
+	for i := range productos {
+		productosPtr = append(productosPtr, &productos[i])
+	}
+	err := handler.productoService.CrearProductos(productosPtr)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"mensaje": "Productos creados exitosamente"})
 }
 
 func (handler *ProductoHandler) ObtenerProductos(c *gin.Context) {
@@ -86,35 +115,27 @@ func (handler *ProductoHandler) EliminarProducto(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusNoContent, gin.H{"mensaje": "Producto eliminado exitosamente"})
+	// En lugar de 204 No Content, devuelve 200 con un mensaje
+	c.JSON(http.StatusOK, gin.H{"mensaje": "Producto eliminado exitosamente"})
 }
+
 func (handler *ProductoHandler) ObtenerListaConStockMinimo(c *gin.Context) {
-	// Obtener la lista de productos con stock mínimo
-	resultado, err := handler.productoService.ObtenerListaConStockMinimo()
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	var filtro utils.FiltroProducto
+
+	// Bindear el JSON del body al filtro
+	if err := c.ShouldBindJSON(&filtro); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Formato de entrada inválido"})
 		return
 	}
 
-	// Obtener parámetro de consulta
-	categoria := c.Query("categoria")
-
-	// Filtrar la lista de productos si el parámetro de consulta está presente
-	var productosFiltrados []dto.Producto
-	if categoria != "" {
-		categoria = strings.ToLower(categoria)
-		for _, producto := range resultado {
-			if strings.ToLower(string(producto.TipoProducto)) == categoria {
-				productosFiltrados = append(productosFiltrados, *producto)
-			}
-		}
-	} else {
-		for _, producto := range resultado {
-			productosFiltrados = append(productosFiltrados, *producto)
-		}
+	// Llamar al servicio con el filtro
+	resultado, err := handler.productoService.ObtenerListaConStockMinimo(filtro)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 
-	c.JSON(http.StatusOK, productosFiltrados)
+	c.JSON(http.StatusOK, resultado)
 }
 func (handler *ProductoHandler) ObtenerProductoPorID(c *gin.Context) {
 	id := c.Param("id")

@@ -14,6 +14,7 @@ type Camion struct {
 	Patente            string    `json:"patente" validate:"required"`
 	PesoMaximo         int       `json:"pesoMaximo" validate:"required,gt=0"`
 	CostoPorKilometro  int       `json:"costoPorKilometro" validate:"required,gt=0"`
+	Eliminado          bool      `json:"eliminado"`
 	FechaCreacion      time.Time `json:"fechaCreacion"`
 	FechaActualizacion time.Time `json:"fechaActualizacion"`
 }
@@ -28,11 +29,11 @@ func (c *Camion) Validate() error {
 		for _, err := range err.(validator.ValidationErrors) {
 			switch err.Field() {
 			case "Patente":
-				return fmt.Errorf("La patente del camión es obligatoria")
+				return fmt.Errorf("la patente del camión es obligatoria")
 			case "PesoMaximo":
-				return fmt.Errorf("El peso máximo es obligatorio y debe ser un número positivo")
+				return fmt.Errorf("el peso máximo es obligatorio y debe ser un número positivo")
 			case "CostoPorKilometro":
-				return fmt.Errorf("El costo por kilómetro es obligatorio y debe ser un número positivo")
+				return fmt.Errorf("el costo por kilómetro es obligatorio y debe ser un número positivo")
 			}
 		}
 	}
@@ -45,6 +46,7 @@ func NewCamion(camion model.Camion) *Camion {
 		Patente:            camion.Patente,
 		PesoMaximo:         camion.PesoMaximo,
 		CostoPorKilometro:  camion.CostoPorKilometro,
+		Eliminado:          camion.Eliminado,
 		FechaCreacion:      camion.FechaCreacion,
 		FechaActualizacion: camion.FechaActualizacion,
 	}
@@ -56,6 +58,7 @@ func (camion Camion) GetModel() model.Camion {
 		Patente:            camion.Patente,
 		PesoMaximo:         camion.PesoMaximo,
 		CostoPorKilometro:  camion.CostoPorKilometro,
+		Eliminado:          camion.Eliminado,
 		FechaCreacion:      camion.FechaCreacion,
 		FechaActualizacion: camion.FechaActualizacion,
 	}

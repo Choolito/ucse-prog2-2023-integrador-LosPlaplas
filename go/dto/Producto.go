@@ -18,6 +18,7 @@ type Producto struct {
 	PesoUnitario       int                `json:"pesoUnitario" validate:"required,gt=0"`
 	StockMinimo        int                `json:"stockMinimo" validate:"required,gt=0"`
 	CantidadEnStock    int                `json:"cantidadEnStock" validate:"required,gt=0"`
+	Eliminado          bool               `json:"eliminado"`
 	FechaCreacion      time.Time          `json:"fechaCreacion"`
 	FechaActualizacion time.Time          `json:"fechaActualizacion"`
 }
@@ -46,6 +47,7 @@ func (p *Producto) Validate() error {
 			case "CantidadEnStock":
 				return fmt.Errorf("la cantidad en stock es obligatoria y debe ser un número positivo")
 			}
+
 		}
 	}
 	return nil
@@ -61,6 +63,7 @@ func NewProducto(producto model.Producto) *Producto {
 		PesoUnitario:       producto.PesoUnitario,
 		StockMinimo:        producto.StockMinimo,
 		CantidadEnStock:    producto.CantidadEnStock,
+		Eliminado:          producto.Eliminado,
 		FechaCreacion:      producto.FechaCreacion,
 		FechaActualizacion: producto.FechaActualizacion,
 	}
@@ -76,6 +79,7 @@ func (producto Producto) GetModel() model.Producto {
 		PesoUnitario:       producto.PesoUnitario,
 		StockMinimo:        producto.StockMinimo,
 		CantidadEnStock:    producto.CantidadEnStock,
+		Eliminado:          producto.Eliminado,
 		FechaCreacion:      producto.FechaCreacion,
 		FechaActualizacion: producto.FechaActualizacion,
 	}

@@ -11,6 +11,7 @@ type Camion struct {
 	Patente            string             `bson:"patente"`
 	PesoMaximo         int                `bson:"pesoMaximo"`
 	CostoPorKilometro  int                `bson:"costoPorKilometro"`
+	Eliminado          bool               `bson:"eliminado"`
 	FechaCreacion      time.Time          `bson:"fechaCreacion"`
 	FechaActualizacion time.Time          `bson:"fechaActualizacion"`
 }

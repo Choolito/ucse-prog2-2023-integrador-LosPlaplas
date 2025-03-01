@@ -28,16 +28,17 @@ function obtenerProductos() {
     errorObtenerProductos
   );
 }
+  
 
 function exitoObtenerProductos(response) {
-  const elementosTable = document //tabla en la que se colocan los envios que se obtienen
+  const elementosTable = document
     .getElementById("elementosTable")
     .querySelector("tbody");
 
   // Llenar la tabla con los datos obtenidos
   if (response != null) {
     response.forEach((elemento) => {
-      const row = document.createElement("tr"); //crear una fila
+      const row = document.createElement("tr");
 
       row.innerHTML = ` 
                     <td>${elemento.codigoProducto}</td>
@@ -48,8 +49,8 @@ function exitoObtenerProductos(response) {
                     <td>${elemento.stockMinimo}</td>
                     <td>${elemento.cantidadEnStock}</td>
                     <td class="acciones"> 
-                    <a href="form_nuevo_producto.html?id=${elemento.ID}&tipo=EDITAR">Editar</a> |
-                    <a href="index_producto.html?id=${elemento.ID}&tipo=ELIMINAR">Eliminar</a> 
+                    <a href="form_nuevo_producto.html?id=${elemento.id}&tipo=EDITAR">Editar</a> |
+                    <a href="index_producto.html?id=${elemento.id}&tipo=ELIMINAR">Eliminar</a> 
                     </td>
                     `;
 
@@ -57,6 +58,7 @@ function exitoObtenerProductos(response) {
     });
   }
 }
+
 
 function errorObtenerProductos(error) {
   alert("Error en la solicitud al servidor.");

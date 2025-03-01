@@ -5,6 +5,5 @@ import (
 )
 
 type FiltroProducto struct {
-	FiltrarPorStockMinimo bool
-	TipoProducto          model.TipoProducto
+	TipoProducto model.TipoProducto
 }

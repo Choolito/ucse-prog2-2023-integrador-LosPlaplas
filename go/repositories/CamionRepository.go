@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/model"
@@ -16,7 +17,7 @@ type CamionRepositoryInterface interface {
 	CrearCamion(camion model.Camion) error
 	ObtenerCamiones() ([]*model.Camion, error)
 	ActualizarCamion(id string, camion model.Camion) (*mongo.UpdateResult, error)
-	EliminarCamion(id string) (*mongo.DeleteResult, error)
+	EliminarCamion(id string) error
 	//envios
 	ObtenerCamionPorID(id string) (*model.Camion, error)
 }
@@ -43,11 +44,14 @@ func (cr *CamionRepository) CrearCamion(camion model.Camion) error {
 
 func (cr *CamionRepository) ObtenerCamiones() ([]*model.Camion, error) {
 	collection := cr.db.GetClient().Database("LosPlaplas").Collection("camiones")
-	filtro := bson.M{}
+	// Filtro para excluir los camiones con eliminado: true
+	filtro := bson.M{"eliminado": bson.M{"$ne": true}}
 
 	cursor, err := collection.Find(context.Background(), filtro)
-
-	defer cursor.Close(context.Background())
+	if err != nil {
+		return nil, err // Se retorna el error si ocurre uno
+	}
+	defer cursor.Close(context.Background()) // Ahora se puede usar defer después de comprobar el error
 
 	var camiones []*model.Camion
 	for cursor.Next(context.Background()) {
@@ -58,7 +62,7 @@ func (cr *CamionRepository) ObtenerCamiones() ([]*model.Camion, error) {
 		}
 		camiones = append(camiones, &camion)
 	}
-	return camiones, err
+	return camiones, nil
 }
 
 func (cr *CamionRepository) ObtenerCamionPorID(id string) (*model.Camion, error) {
@@ -84,6 +88,7 @@ func (repo *CamionRepository) ActualizarCamion(id string, camion model.Camion) (
 	filter := bson.M{"_id": objectID}
 	update := bson.M{
 		"$set": bson.M{
+			"pesoMaximo":         camion.PesoMaximo,
 			"costoPorKilometro":  camion.CostoPorKilometro,
 			"fechaActualizacion": time.Now(),
 		},
@@ -96,16 +101,46 @@ func (repo *CamionRepository) ActualizarCamion(id string, camion model.Camion) (
 	return result, nil
 }
 
-func (repo *CamionRepository) EliminarCamion(id string) (*mongo.DeleteResult, error) {
-	collection := repo.db.GetClient().Database("LosPlaplas").Collection("camiones")
+func (repo *CamionRepository) EliminarCamion(id string) error {
+	collectionCamiones := repo.db.GetClient().Database("LosPlaplas").Collection("camiones")
+	collectionEnvios := repo.db.GetClient().Database("LosPlaplas").Collection("envios")
 	objectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return nil, err
+		return fmt.Errorf("error al convertir ID del camión: %s", err)
 	}
 
-	result, err := collection.DeleteOne(context.Background(), bson.M{"_id": objectID})
+	fmt.Println("ID convertido a ObjectID:", objectID) // Log para depuración
+
+	count, err := collectionEnvios.CountDocuments(context.Background(), bson.M{
+		"idCamion": objectID,
+		"estado":   "En ruta",
+	})
 	if err != nil {
-		return nil, err
+		fmt.Println("Error al contar documentos:", err)
+		return err
 	}
-	return result, nil
+
+	fmt.Println("Cantidad de envíos en estado 'En Ruta':", count)
+
+	if count > 0 {
+		return fmt.Errorf("no se puede eliminar el camión porque tiene envíos en estado 'En Ruta'")
+	}
+
+	// Crear el filtro para buscar el camión por ID
+	filtro := bson.M{"_id": objectID}
+	// Crear la actualización para establecer "eliminado": true
+	actualizacion := bson.M{"$set": bson.M{"eliminado": true}}
+
+	// Ejecutar la actualización en MongoDB
+	resultado, err := collectionCamiones.UpdateOne(context.Background(), filtro, actualizacion)
+	if err != nil {
+		return err
+	}
+
+	// Verificar si el documento fue actualizado
+	if resultado.ModifiedCount == 0 {
+		return fmt.Errorf("no se pudo marcar como eliminado el camión con el id: %s", id)
+	}
+
+	return nil
 }

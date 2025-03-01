@@ -4,45 +4,57 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="origin">
-    <title>Nuevo Pedido</title>
+    <title>Nuevo Pedido - Distribuidora Los Plaplas</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
-    <link href="/web/styles/styles_form.css" rel="stylesheet">
+    <link href="/web/styles/pedidos-styles.css" rel="stylesheet">
 </head>
 <body>
-    <div class="formulario">
-        <h2 class="titulo">Dar de Alta Pedido</h2>
-        <form>
-            <button type="sumbit">Guardar pedido</button>
-            <button type="button" class="cancelar" onclick="window.location.href='/web/pedidos/index_pedido.html';">Cancelar</button>
-            <!-- Campos existentes -->
-            <div class="form-group">
-                <label for="ciudad">Ciudad Destino:</label>
-                <input type="text" id="ciudad" name="ciudad" >
-            </div>
-        </form>
-        <!-- Tabla de productos -->
-        <table id="elementosTable" cellspacing="0" cellpadding="0">
-            <thead>
-                <tr>
-                    <th>Codigo producto</th>
-                    <th>Nombre</th>
-                    <th>Tipo de producto</th>
-                    <th>Precio unitario</th>
-                    <th>Cantidad</th>
-                    <th>Seleccionar</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Filas de datos de productos -->
-            </tbody>
-            <tfoot>
-                <!-- Filas de pie -->
-            </tfoot>
-        </table>
-    </div>
+    <header class="header">
+        <div class="header-content">
+            <img src="/web/icono.jpg" alt="Logo" class="logo">
+            <h1 class="company-name">Distribuidora Los Plaplas</h1>
+        </div>
+    </header>
+    <nav class="navigation">
+        <a href="/web/index_inicio.html">Inicio</a>
+        <a href="/web/productos/index_producto.html">Productos</a>
+        <a href="/web/pedidos/index_pedido.html" class="active">Pedidos</a>
+        <a href="/web/camiones/index_camion.html">Camiones</a>
+        <a href="/web/envios/index_envio.html">Envíos</a>
+    </nav>
+    <main class="main-content">
+        <div class="formulario">
+            <h2>Dar de Alta Pedido</h2>
+            <form>
+                <div class="form-group">
+                    <label for="ciudad">Ciudad Destino:</label>
+                    <input type="text" id="ciudad" name="ciudad" required>
+                </div>
+                <button type="submit">Guardar pedido</button>
+                <button type="button" class="cancelar" onclick="window.location.href='/web/pedidos/index_pedido.html';">Cancelar</button>
+            </form>
+            <h3>Productos Disponibles</h3>
+            <table id="elementosTable">
+                <thead>
+                    <tr>
+                        <th>Código producto</th>
+                        <th>Nombre</th>
+                        <th>Tipo de producto</th>
+                        <th>Precio unitario</th>
+                        <th>Cantidad</th>
+                        <th>Seleccionar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Filas de datos de productos -->
+                </tbody>
+            </table>
+        </div>
+    </main>
     <script src="/web/request.js"></script>
     <script src="form.js"></script>
 </body>
 </html>
+

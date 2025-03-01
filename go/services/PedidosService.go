@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/dto"
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/repositories"
@@ -13,6 +14,7 @@ type PedidosInterface interface {
 	ObtenerPedidos() ([]*dto.Pedidos, error)
 	EliminarPedido(id string) error
 	ObtenerPedidosPendientes() ([]*dto.Pedidos, error)
+	ObtenerPedidosAceptados() ([]*dto.Pedidos, error)
 	ActualizarPedidoAceptado(id string) error
 }
 
@@ -33,10 +35,15 @@ func NewPedidosService(pedidosRepository repositories.PedidosRepositoryInterface
 //Metodo que devuelva []AceptadosElegidos que no superen el pesoMaximo --> Pasa a estado "Para Enviar"
 
 func (ps *PedidosService) CrearPedido(pedido *dto.Pedidos) error {
-
 	var productosCantidad []dto.ProductoCantidad
+
 	for _, producto := range pedido.ListaProductos {
-		productoBuscado, _ := ps.productoRepository.ObtenerProductoPorID(producto.IDProducto)
+		productoBuscado, err := ps.productoRepository.ObtenerProductoPorID(producto.IDProducto)
+		if err != nil || productoBuscado == nil {
+			log.Printf("error: Producto con ID %s no encontrado o está eliminado", producto.IDProducto)
+			return fmt.Errorf("el producto con ID %s no existe o está eliminado", producto.IDProducto)
+		}
+
 		var ProductoCantidad dto.ProductoCantidad
 		ProductoCantidad.IDProducto = producto.IDProducto
 		ProductoCantidad.CodigoProducto = productoBuscado.CodigoProducto
@@ -46,6 +53,7 @@ func (ps *PedidosService) CrearPedido(pedido *dto.Pedidos) error {
 		ProductoCantidad.PesoUnitario = productoBuscado.PesoUnitario
 		productosCantidad = append(productosCantidad, ProductoCantidad)
 	}
+
 	pedido.ListaProductos = productosCantidad
 	_, err := ps.pedidosRepository.CrearPedido(pedido.GetModel())
 	return err
@@ -88,6 +96,18 @@ func (ps *PedidosService) EliminarPedido(id string) error {
 
 func (ps *PedidosService) ObtenerPedidosPendientes() ([]*dto.Pedidos, error) {
 	pedidosDB, err := ps.pedidosRepository.ObtenerPedidosPendientes()
+
+	var pedidos []*dto.Pedidos
+	for _, pedidoDB := range pedidosDB {
+		pedido := dto.NewPedidos(*pedidoDB)
+		pedidos = append(pedidos, pedido)
+	}
+
+	return pedidos, err
+}
+
+func (ps *PedidosService) ObtenerPedidosAceptados() ([]*dto.Pedidos, error) {
+	pedidosDB, err := ps.pedidosRepository.ObtenerPedidosAceptados()
 
 	var pedidos []*dto.Pedidos
 	for _, pedidoDB := range pedidosDB {

@@ -127,6 +127,17 @@ func (ph *PedidosHandler) ObtenerPedidosPendientes(c *gin.Context) {
 
 	c.JSON(http.StatusOK, pedidos)
 }
+
+func (ph *PedidosHandler) ObtenerPedidosAceptados(c *gin.Context) {
+	pedidos, err := ph.pedidosService.ObtenerPedidosAceptados()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, pedidos)
+}
+
 func (ph *PedidosHandler) ActualizarPedidoAceptado(c *gin.Context) {
 	id := c.Param("id")
 

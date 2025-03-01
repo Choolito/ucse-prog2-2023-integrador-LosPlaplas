@@ -4,34 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="origin">
-    <title>Nueva Parada</title>
+    <title>Nueva Parada - Distribuidora Los Plaplas</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
-    <link href="/web/styles/styles_form.css" rel="stylesheet">
+    <link href="/web/styles/envios-styles.css" rel="stylesheet">
 </head>
 <body>
-
-    <div class="formulario">
-        <h2>Ingresar nueva parada</h2>
-        <form action="/" method="post" id="formParada">
-            <div class="form-group">
-                <label for="Ciudad">Ciudad:</label>
-                <input type="text" id="ciudad" name="Ciudad" required>
-            </div>
-            <div class="form-group">
-                <label for="kmrecorridos">Kilometros recorridos:</label>
-                <input type="text" id="kmrecorridos" name="kmrecorridos" required>
-            </div>
-            <button type="submit" id="guardar-parada">Guardar Parada</button>
-            <button type="button" class="cancelar" onclick="window.location.href='/web/envios/index_envio.html';">Cancelar</button>
-        </form>
-    </div>
-
-    <div class="botonera">
-        <!-- Contenido de la botonera -->
-    </div>
+    <header class="header">
+        <div class="header-content">
+            <img src="/web/icono.jpg" alt="Logo" class="logo">
+            <h1 class="company-name">Distribuidora Los Plaplas</h1>
+        </div>
+    </header>
+    <nav class="navigation">
+        <a href="/web/index_inicio.html">Inicio</a>
+        <a href="/web/productos/index_producto.html">Productos</a>
+        <a href="/web/pedidos/index_pedido.html">Pedidos</a>
+        <a href="/web/camiones/index_camion.html">Camiones</a>
+        <a href="/web/envios/index_envio.html" class="active">Envíos</a>
+    </nav>
+    <main class="main-content">
+        <div class="formulario">
+            <h2>Ingresar nueva parada</h2>
+            <form action="/" method="post" id="formParada">
+                <div class="form-group">
+                    <label for="ciudad">Ciudad:</label>
+                    <input type="text" id="ciudad" name="Ciudad" required>
+                </div>
+                <div class="form-group">
+                    <label for="kmrecorridos">Kilómetros recorridos:</label>
+                    <input type="number" id="kmrecorridos" name="kmrecorridos" required>
+                </div>
+                <button type="submit" id="guardar-parada">Guardar Parada</button>
+                <button type="button" class="cancelar" onclick="window.location.href='/web/envios/index_envio.html';">Cancelar</button>
+            </form>
+        </div>
+    </main>
     <script src="form.js"></script>
     <script src="/web/request.js"></script>
 </body>
 </html>
+

@@ -42,10 +42,10 @@ func mappingRoutes() {
 	//router.Use(middlewares.CORSMiddleware())
 	//Productos CRUD
 	router.POST("/productos", productoHandler.CrearProducto)
+	router.POST("/productos/masivos", productoHandler.CrearProductos)
 	router.GET("/productos", productoHandler.ObtenerProductos)
 	router.GET("/productos/:id", productoHandler.ObtenerProductoPorID)
-	router.GET("/productos/stockminimo", productoHandler.ObtenerListaConStockMinimo) //lista stock minimo y ?categoria= filtro
-	//Falta usar este
+	router.POST("/productos/stockminimo", productoHandler.ObtenerListaConStockMinimo) //lista stock minimo y ?categoria= filtro
 	router.PUT("/productos/:id", productoHandler.ActualizarProducto)
 	router.DELETE("/productos/:id", productoHandler.EliminarProducto)
 
@@ -59,6 +59,7 @@ func mappingRoutes() {
 	//Pedidos CRUD
 	router.POST("/pedidos", pedidosHandler.CrearPedido)
 	router.GET("/pedidos", pedidosHandler.ObtenerPedidos)
+	router.GET("/pedidos/aceptados", pedidosHandler.ObtenerPedidosAceptados)
 	//Se puede filtrar por código de envío, estado, rango de fecha de creación.
 	//router.PUT("/pedidos/:id", pedidosHandler.ActualizarPedido)
 	router.PUT("/pedidos/cancelar/:id", pedidosHandler.EliminarPedido)

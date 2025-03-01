@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="origin">
+    <title>Seleccionar Envío - Distribuidora Los Plaplas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="/web/styles/envios-styles.css" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <img src="/web/icono.jpg" alt="Logo" class="logo">
+            <h1 class="company-name">Distribuidora Los Plaplas</h1>
+        </div>
+    </header>
+    
+    <nav class="navigation">
+        <a href="/web/index_inicio.html">Inicio</a>
+        <a href="/web/productos/index_producto.html">Productos</a>
+        <a href="/web/pedidos/index_pedido.html">Pedidos</a>
+        <a href="/web/camiones/index_camion.html">Camiones</a>
+        <a href="/web/envios/index_envio.html" class="active">Envíos</a>
+    </nav>
+
+    <main class="main-content">
+        <h2>Seleccionar Envío</h2>
+        
+        <div class="filtro-container">
+            <h3>Seleccione un camión</h3>
+            <select id="camion-select">
+                <option value="">Seleccione un camión</option>
+                <!-- Opciones generadas dinámicamente -->
+            </select>
+        </div>
+
+        <div class="pedido-container">
+            <h3>Pedidos Disponibles</h3>
+            <table id="pedidosTable">
+                <thead>
+                    <tr>
+                        <th>Seleccionar</th>
+                        <th>Código pedido</th>
+                        <th>Productos</th>
+                        <th>Ciudad destino</th>
+                        <th>Estado</th>
+                        <th>Fecha de pedido</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Filas de datos de pedidos generadas dinámicamente -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="botonera">
+            <button id="confirmar-envio" class="filtro-button primary">Confirmar Envío</button>
+        </div>
+    </main>
+
+    <script src="/web/request.js"></script>
+    <script src="form_nuevo_envio.js"></script>
+</body>
+</html>
+

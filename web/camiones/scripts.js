@@ -46,8 +46,8 @@ function exitoObtenerCamiones(response) {
                     <td>${elemento.pesoMaximo}</td>
                     <td>${elemento.costoPorKilometro}</td>
                     <td class="acciones"> 
-                    <a href="form_nuevo_camion.html?id=${elemento.ID}&tipo=EDITAR">Editar</a> |
-                    <a href="index_camion.html?id=${elemento.ID}&tipo=ELIMINAR">Eliminar</a> 
+                    <a href="form_nuevo_camion.html?id=${elemento.id}&tipo=EDITAR">Editar</a> |
+                    <a href="index_camion.html?id=${elemento.id}&tipo=ELIMINAR">Eliminar</a> 
                     </td>
                     `;
 
@@ -63,6 +63,11 @@ function errorObtenerCamiones(error) {
 }
 
 function eliminarCamion(idCamion) {
+  const confirmacion = confirm("¿Estás seguro de que deseas eliminar este camión?");
+  if (!confirmacion) {
+    return; // Si el usuario cancela, no se ejecuta la solicitud
+  }
+
   makeRequest(
     `${urlConFiltro}/${idCamion}`,
     Method.DELETE,
@@ -71,17 +76,35 @@ function eliminarCamion(idCamion) {
     CallType.PRIVATE,
     exitoCamion,
     errorCamion
-  )
+  );
 }
+
 
 function exitoCamion(response) {
-  alert("Camion eliminado con exito");
-  location.reload();
+  alert("Camión eliminado con éxito");
+  window.location.href = "index_camion.html"; // Redirige sin los parámetros de eliminación
 }
 
-function errorCamion(error) {
-  alert("Error en la solicitud al servidor.");
-  console.log(error.json());
-  throw new Error("Error en la solicitud al servidor.");
+
+function errorCamion(error, responseBody) {
+  console.error("Error al eliminar camión", error, responseBody);
+
+  let mensajeError = "Error inesperado en la solicitud al servidor.";
+
+  if (responseBody && responseBody.error) {
+      mensajeError = "Error: " + responseBody.error; // Mostrar el mensaje de error recibido del servidor
+  }
+
+  alert(mensajeError);
+
+  // Redirigir después de mostrar el mensaje de error
+  window.location.href = "index_camion.html";
 }
+
+
+
+
+
+
+
 
