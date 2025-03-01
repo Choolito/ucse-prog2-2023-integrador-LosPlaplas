@@ -2,16 +2,12 @@ package utils
 
 import (
 	"time"
-
-	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/model"
 )
 
 type FiltroEnvio struct {
-	PatenteCamion                 string
-	Estado                        model.EstadoEnvio
-	UltimaParada                  string
-	FechaCreacionDesde            time.Time
-	FechaCreacionHasta            time.Time
-	FechaUltimaActualizacionDesde time.Time
-	FechaUltimaActualizacionHasta time.Time
+	PatenteCamion      string     `json:"patenteCamion"`
+	Estado             string     `json:"estado"`
+	UltimaParada       string     `json:"ultimaParada"`
+	FechaCreacionDesde *time.Time `json:"fechaCreacionDesde"`
+	FechaCreacionHasta *time.Time `json:"fechaCreacionHasta"`
 }
