@@ -21,7 +21,7 @@ type ProductoRepositoryInterface interface {
 	ActualizarProducto(id string, producto model.Producto) (*mongo.UpdateResult, error)
 	EliminarProducto(id string) error
 	DescontarStock(id string, cantidad int) (*mongo.UpdateResult, error)
-	ObtenerListaConStockMinimo() ([]*model.Producto, error)
+	ObtenerListaConStockMinimo(filtro utils.FiltroProducto) ([]*model.Producto, error)
 }
 
 type ProductoRepository struct {
@@ -162,14 +162,22 @@ func (pr *ProductoRepository) DescontarStock(id string, cantidad int) (*mongo.Up
 	return result, nil
 }
 
-func (repo *ProductoRepository) ObtenerListaConStockMinimo() ([]*model.Producto, error) {
+func (repo *ProductoRepository) ObtenerListaConStockMinimo(filtro utils.FiltroProducto) ([]*model.Producto, error) {
 	var productos []*model.Producto
 	collection := repo.db.GetClient().Database("LosPlaplas").Collection("productos")
+
+	// Filtro base: SIEMPRE filtra por stock mínimo
 	filter := bson.M{
 		"$expr": bson.M{
 			"$lt": []interface{}{"$cantidadEnStock", "$stockMinimo"},
 		},
-	} // Productos con cantidad en stock menor que el stock mínimo
+	}
+
+	// Si `tipoProducto` está presente en el JSON, se agrega al filtro
+	if filtro.TipoProducto != "" {
+		filter["tipoProducto"] = filtro.TipoProducto
+	}
+
 	cursor, err := collection.Find(context.Background(), filter)
 	if err != nil {
 		return nil, err
