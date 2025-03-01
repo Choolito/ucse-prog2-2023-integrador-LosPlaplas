@@ -9,6 +9,7 @@ import (
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/model"
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/utils"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 
 	"context"
@@ -208,7 +209,19 @@ func (enviosRepository *EnviosRepository) ObtenerEnviosFiltrados(filtro *utils.F
 	filterMongo := bson.M{}
 
 	if filtro.PatenteCamion != "" {
-		filterMongo["patenteCamion"] = filtro.PatenteCamion
+		var camion struct {
+			ID primitive.ObjectID `bson:"_id"`
+		}
+		collectionCamiones := enviosRepository.db.GetClient().Database("LosPlaplas").Collection("camiones")
+		err := collectionCamiones.FindOne(context.TODO(), bson.M{"patente": filtro.PatenteCamion}).Decode(&camion)
+		if err != nil {
+			if err == mongo.ErrNoDocuments {
+				// No hay camión con esa patente, retornar lista vacía sin error
+				return []*model.Envio{}, nil
+			}
+			return nil, err // Error en la consulta
+		}
+		filterMongo["idCamion"] = camion.ID
 	}
 	if filtro.Estado != "" {
 		filterMongo["estado"] = filtro.Estado
