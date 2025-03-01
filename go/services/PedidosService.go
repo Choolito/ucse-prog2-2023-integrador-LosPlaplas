@@ -14,6 +14,7 @@ type PedidosInterface interface {
 	ObtenerPedidos() ([]*dto.Pedidos, error)
 	EliminarPedido(id string) error
 	ObtenerPedidosPendientes() ([]*dto.Pedidos, error)
+	ObtenerPedidosAceptados() ([]*dto.Pedidos, error)
 	ActualizarPedidoAceptado(id string) error
 }
 
@@ -95,6 +96,18 @@ func (ps *PedidosService) EliminarPedido(id string) error {
 
 func (ps *PedidosService) ObtenerPedidosPendientes() ([]*dto.Pedidos, error) {
 	pedidosDB, err := ps.pedidosRepository.ObtenerPedidosPendientes()
+
+	var pedidos []*dto.Pedidos
+	for _, pedidoDB := range pedidosDB {
+		pedido := dto.NewPedidos(*pedidoDB)
+		pedidos = append(pedidos, pedido)
+	}
+
+	return pedidos, err
+}
+
+func (ps *PedidosService) ObtenerPedidosAceptados() ([]*dto.Pedidos, error) {
+	pedidosDB, err := ps.pedidosRepository.ObtenerPedidosAceptados()
 
 	var pedidos []*dto.Pedidos
 	for _, pedidoDB := range pedidosDB {

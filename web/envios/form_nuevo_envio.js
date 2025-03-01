@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
   function cargarPedidos() {
     makeRequest(
-      "http://localhost:8080/pedidos",
+      "http://localhost:8080/pedidos/aceptados",
       Method.GET,
       null,
       ContentType.JSON,
@@ -208,8 +208,17 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   
   function errorEnviarEnvio(error, responseBody) {
-    console.error("Error al registrar el envío", error, responseBody)
-    alert("Error al registrar el envío. Intente nuevamente.")
+    console.error("Error al registrar el envío", error, responseBody);
+
+    // Intentar extraer el mensaje de error del responseBody
+    let mensajeError = "Error al registrar el envío. Intente nuevamente.";
+
+    if (responseBody && responseBody.error) {
+        mensajeError = "Error: " +  responseBody.error; // Mostrar el mensaje de error recibido del servidor
+    }
+
+    alert(mensajeError);
   }
+
   
   

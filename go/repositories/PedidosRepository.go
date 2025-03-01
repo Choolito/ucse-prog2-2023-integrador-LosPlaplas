@@ -18,6 +18,7 @@ type PedidosRepositoryInterface interface {
 	ActualizarPedido(pedido *model.Pedidos) error
 	EliminarPedido(id string) (bool, error)
 	ObtenerPedidosPendientes() ([]*model.Pedidos, error)
+	ObtenerPedidosAceptados() ([]*model.Pedidos, error)
 	ActualizarPedidoAceptado(id string) (*mongo.UpdateResult, error)
 
 	//envio
@@ -144,6 +145,33 @@ func (pr *PedidosRepository) ObtenerPedidosPendientes() ([]*model.Pedidos, error
 		pedidos = append(pedidos, &pedido)
 	}
 	return pedidos, err
+}
+
+func (pr *PedidosRepository) ObtenerPedidosAceptados() ([]*model.Pedidos, error) {
+	collection := pr.db.GetClient().Database("LosPlaplas").Collection("pedidos")
+	filtro := bson.M{"estadoPedido": "Aceptado"}
+
+	cursor, err := collection.Find(context.TODO(), filtro)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(context.Background())
+
+	var pedidos []*model.Pedidos
+	for cursor.Next(context.Background()) {
+		var pedido model.Pedidos
+		err := cursor.Decode(&pedido)
+		if err != nil {
+			return nil, err
+		}
+		pedidos = append(pedidos, &pedido)
+	}
+
+	if err := cursor.Err(); err != nil {
+		return nil, err
+	}
+
+	return pedidos, nil
 }
 
 // Aceptar pedido

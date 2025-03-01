@@ -128,7 +128,7 @@ func (enviosService *EnviosService) GenerarParadaEnvio(id string, parada dto.Par
 }
 
 func (enviosService *EnviosService) FinalizarViajeEnvio(id string, paradaDestino dto.Parada) error {
-	_, err := enviosService.enviosRepository.FinalizarViajeEnvio(id)
+	_, err := enviosService.enviosRepository.FinalizarViajeEnvio(id, paradaDestino.GetModel())
 	if err != nil {
 		return err
 	}
@@ -149,7 +149,7 @@ func (enviosService *EnviosService) CambiarEstadoEnvio(envio *dto.Envio, user *d
 	nuevoEstado := envio.Estado
 
 	if !model.EsUnEstadoEnvioValido(nuevoEstado) {
-		return false, errors.New("El estado del envío no es válido")
+		return false, errors.New("el estado del envío no es válido")
 	}
 
 	envioDB, err := enviosService.enviosRepository.ObtenerEnvioPorID(envio.ID)

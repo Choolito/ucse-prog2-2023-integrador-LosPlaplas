@@ -102,10 +102,28 @@ func (repo *CamionRepository) ActualizarCamion(id string, camion model.Camion) (
 }
 
 func (repo *CamionRepository) EliminarCamion(id string) error {
-	collection := repo.db.GetClient().Database("LosPlaplas").Collection("camiones")
+	collectionCamiones := repo.db.GetClient().Database("LosPlaplas").Collection("camiones")
+	collectionEnvios := repo.db.GetClient().Database("LosPlaplas").Collection("envios")
 	objectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
+		return fmt.Errorf("error al convertir ID del camión: %s", err)
+	}
+
+	fmt.Println("ID convertido a ObjectID:", objectID) // Log para depuración
+
+	count, err := collectionEnvios.CountDocuments(context.Background(), bson.M{
+		"idCamion": objectID,
+		"estado":   "En ruta",
+	})
+	if err != nil {
+		fmt.Println("Error al contar documentos:", err)
 		return err
+	}
+
+	fmt.Println("Cantidad de envíos en estado 'En Ruta':", count)
+
+	if count > 0 {
+		return fmt.Errorf("no se puede eliminar el camión porque tiene envíos en estado 'En Ruta'")
 	}
 
 	// Crear el filtro para buscar el camión por ID
@@ -114,7 +132,7 @@ func (repo *CamionRepository) EliminarCamion(id string) error {
 	actualizacion := bson.M{"$set": bson.M{"eliminado": true}}
 
 	// Ejecutar la actualización en MongoDB
-	resultado, err := collection.UpdateOne(context.Background(), filtro, actualizacion)
+	resultado, err := collectionCamiones.UpdateOne(context.Background(), filtro, actualizacion)
 	if err != nil {
 		return err
 	}
