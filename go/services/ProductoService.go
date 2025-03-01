@@ -6,6 +6,7 @@ import (
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/dto"
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/model"
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/repositories"
+	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/utils"
 )
 
 type ProductoInterface interface {
@@ -15,7 +16,7 @@ type ProductoInterface interface {
 	ObtenerProductos() ([]*dto.Producto, error)
 	ActualizarProducto(id string, producto *dto.Producto) error
 	EliminarProducto(id string) error
-	ObtenerListaConStockMinimo() ([]*dto.Producto, error)
+	ObtenerListaConStockMinimo(filtro utils.FiltroProducto) ([]*dto.Producto, error)
 	ObtenerProductoPorID(id string) (*dto.Producto, error)
 }
 
@@ -76,9 +77,9 @@ func (ps *ProductoService) EliminarProducto(id string) error {
 	return nil
 }
 
-func (service *ProductoService) ObtenerListaConStockMinimo() ([]*dto.Producto, error) {
-	// Lógica para obtener productos con stock mínimo
-	productos, err := service.productoRepository.ObtenerListaConStockMinimo()
+func (service *ProductoService) ObtenerListaConStockMinimo(filtro utils.FiltroProducto) ([]*dto.Producto, error) {
+	// Lógica para obtener productos con stock mínimo, con filtro
+	productos, err := service.productoRepository.ObtenerListaConStockMinimo(filtro)
 	if err != nil {
 		return nil, err
 	}
