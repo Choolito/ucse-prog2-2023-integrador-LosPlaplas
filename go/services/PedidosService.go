@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/utils"
+
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/dto"
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/repositories"
 )
@@ -16,6 +18,7 @@ type PedidosInterface interface {
 	ObtenerPedidosPendientes() ([]*dto.Pedidos, error)
 	ObtenerPedidosAceptados() ([]*dto.Pedidos, error)
 	ActualizarPedidoAceptado(id string) error
+	ObtenerPedidosFiltrados(filtro *utils.FiltroPedido) ([]*dto.Pedidos, error)
 }
 
 type PedidosService struct {
@@ -127,4 +130,18 @@ func (ps *PedidosService) ActualizarPedidoAceptado(id string) error {
 		return fmt.Errorf("no se pudo actualizar el pedido con el id: %s", id)
 	}
 	return nil
+}
+
+func (s *PedidosService) ObtenerPedidosFiltrados(filtro *utils.FiltroPedido) ([]*dto.Pedidos, error) {
+	pedidosModel, err := s.pedidosRepository.ObtenerPedidosFiltrados(filtro)
+	if err != nil {
+		return nil, err
+	}
+
+	var pedidosDTO []*dto.Pedidos
+	for _, pedido := range pedidosModel {
+		pedidosDTO = append(pedidosDTO, dto.NewPedidos(*pedido))
+	}
+
+	return pedidosDTO, nil
 }

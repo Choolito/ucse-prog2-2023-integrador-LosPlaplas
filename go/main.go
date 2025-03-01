@@ -61,7 +61,7 @@ func mappingRoutes() {
 	router.GET("/pedidos", pedidosHandler.ObtenerPedidos)
 	router.GET("/pedidos/aceptados", pedidosHandler.ObtenerPedidosAceptados)
 	//Se puede filtrar por código de envío, estado, rango de fecha de creación.
-	//router.PUT("/pedidos/:id", pedidosHandler.ActualizarPedido)
+	router.POST("/pedidos/filtrado", pedidosHandler.ObtenerPedidosFiltrados)
 	router.PUT("/pedidos/cancelar/:id", pedidosHandler.EliminarPedido)
 	//Lista pedidos pendientes
 	router.GET("/pedidos/pendientes", pedidosHandler.ObtenerPedidosPendientes)

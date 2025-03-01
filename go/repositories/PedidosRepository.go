@@ -8,6 +8,7 @@ import (
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/model"
 	"github.com/Choolito/ucse-prog2-2023-integrador-LosPlaplas/go/utils"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -20,6 +21,7 @@ type PedidosRepositoryInterface interface {
 	ObtenerPedidosPendientes() ([]*model.Pedidos, error)
 	ObtenerPedidosAceptados() ([]*model.Pedidos, error)
 	ActualizarPedidoAceptado(id string) (*mongo.UpdateResult, error)
+	ObtenerPedidosFiltrados(filtro *utils.FiltroPedido) ([]*model.Pedidos, error)
 
 	//envio
 	ObtenerPedidoPorID(id string) (*model.Pedidos, error)
@@ -228,4 +230,59 @@ func (pr *PedidosRepository) ActualizarPedidoEnviado(id string) (*mongo.UpdateRe
 	resultado, err := collection.UpdateOne(context.Background(), filtro, update)
 
 	return resultado, err
+}
+
+func (r *PedidosRepository) ObtenerPedidosFiltrados(filtro *utils.FiltroPedido) ([]*model.Pedidos, error) {
+	collectionEnvios := r.db.GetClient().Database("LosPlaplas").Collection("envios")
+	collectionPedidos := r.db.GetClient().Database("LosPlaplas").Collection("pedidos")
+
+	filterMongo := bson.M{}
+
+	// Filtrar por código de envío
+	if filtro.IdEnvio != "" {
+		var envio struct {
+			Pedidos []primitive.ObjectID `bson:"pedidos"`
+		}
+		idEnvio, err := utils.GetObjectIDFromStringIDErr(filtro.IdEnvio)
+		if err != nil {
+			return nil, err
+		}
+
+		err = collectionEnvios.FindOne(context.TODO(), bson.M{"_id": idEnvio}).Decode(&envio)
+		if err != nil {
+			if err == mongo.ErrNoDocuments {
+				return []*model.Pedidos{}, nil
+			}
+			return nil, err
+		}
+
+		// Filtrar los pedidos por los IDs obtenidos del Envío
+		filterMongo["_id"] = bson.M{"$in": envio.Pedidos}
+	}
+
+	// Filtrar por estado del pedido
+	if filtro.Estado != "" {
+		filterMongo["estadoPedido"] = filtro.Estado
+	}
+
+	// Filtrar por rango de fechas
+	if !filtro.FechaCreacionComienzo.IsZero() && !filtro.FechaCreacionFin.IsZero() {
+		filterMongo["fechaCreacion"] = bson.M{
+			"$gte": filtro.FechaCreacionComienzo,
+			"$lte": filtro.FechaCreacionFin,
+		}
+	}
+
+	cursor, err := collectionPedidos.Find(context.TODO(), filterMongo)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(context.TODO())
+
+	var pedidos []*model.Pedidos
+	if err = cursor.All(context.TODO(), &pedidos); err != nil {
+		return nil, err
+	}
+
+	return pedidos, nil
 }
